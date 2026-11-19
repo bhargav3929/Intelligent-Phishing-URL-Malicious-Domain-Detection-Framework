@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishRadar — Threat-Intel Workbench</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2306B6D4' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 12L19 5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg class="radar" viewBox="0 0 32 32" width="34" height="34" fill="none" stroke="#06B6D4" stroke-width="1.8">
+      <circle cx="16" cy="16" r="13"/><circle cx="16" cy="16" r="8" opacity=".6"/><circle cx="16" cy="16" r="3" fill="#06B6D4"/>
+      <path class="sweep" d="M16 16 L27 5" stroke-linecap="round"/>
+    </svg>
+    <div><h1>PhishRadar</h1><p>Autonomous Phishing URL &amp; Malicious Domain Threat-Intel Workbench</p></div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="inspect" class="active">Single URL Inspector</button>
+    <button data-tab="compare">URL Diff &amp; Compare</button>
+    <button data-tab="ioc">IOC Threat Report</button>
+  </nav>
+  <div class="actions">
+    <div class="pill" id="ratePill" title="Sliding-window demo limit"><span class="dot"></span><span id="rateText">… scans</span></div>
+    <button class="btn ghost" id="histBtn">Scan History</button>
+    <button class="btn ghost" id="keysBtn"><span class="dot" id="keyDot"></span>API Keys</button>
+  </div>
+</header>
+
+<main>
+  <section class="intake card">
+    <div class="intake-head"><span class="label">Target URL &amp; Brand Context</span><span class="muted mono" id="intakeNote"></span></div>
+    <form id="scanForm" class="intake-row">
+      <input id="urlIn" class="mono" placeholder="https://suspicious-site.example/login" autocomplete="off" spellcheck="false">
+      <input id="brandIn" placeholder="Suspected impersonated brand (PayPal, Microsoft, HDFC Bank…)" autocomplete="off">
+      <button class="btn primary" id="scanBtn" type="submit">Inspect Target URL</button>
+    </form>
+    <div class="samples" id="samples"></div>
+  </section>
+
+  <section class="banner card" id="banner"><span class="b-state" id="bState">IDLE</span><span class="b-msg" id="bMsg">Pipeline ready — select a sample or paste a URL.</span><span class="b-timer mono" id="bTimer">0.0s</span></section>
+  <section class="tracker card" id="tracker"></section>
+  <div id="errBox"></div>
+
+  <section id="view-inspect" class="view active"></section>
+  <section id="view-compare" class="view"></section>
+  <section id="view-ioc" class="view"></section>
+
+  <details class="card logs" id="logs"><summary>Execution &amp; Debug Logs</summary><div id="logsBody" class="logs-body mono">No scan run yet.</div></details>
+</main>
+
+<!-- history drawer -->
+<aside class="drawer right" id="histDrawer">
+  <div class="drawer-head"><h3>Scan History</h3><button class="x" data-close="histDrawer">✕</button></div>
+  <div id="histList" class="drawer-body"></div>
+</aside>
+
+<!-- keys modal -->
+<div class="modal" id="keysModal">
+  <div class="modal-card card">
+    <div class="drawer-head"><h3>API Keys (BYOK)</h3><button class="x" data-close="keysModal">✕</button></div>
+    <p class="muted small">Keys are stored locally in <span class="mono">phishradar.db</span> (or loaded from <span class="mono">.env</span>). Leave a field blank to keep the current value.</p>
+    <label>Gemini API Key <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get free key ↗</a>
+      <input id="k_gemini" class="mono" placeholder="AIza…" autocomplete="off"><small id="s_gemini"></small></label>
+    <label>Groq API Key <a href="https://console.groq.com/keys" target="_blank" rel="noopener">Get free key ↗</a>
+      <input id="k_groq" class="mono" placeholder="gsk_…" autocomplete="off"><small id="s_groq"></small></label>
+    <label>IP2WHOIS Key <span class="tag">Optional — free RDAP lookup runs automatically</span>
+      <input id="k_ip2whois" class="mono" placeholder="optional" autocomplete="off"><small id="s_ip2whois"></small></label>
+    <div class="row-end"><button class="btn ghost" id="clearKeys">Clear all</button><button class="btn primary" id="saveKeys">Save Keys</button></div>
+    <div id="keysMsg" class="small"></div>
+  </div>
+</div>
+<div class="scrim" id="scrim"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
