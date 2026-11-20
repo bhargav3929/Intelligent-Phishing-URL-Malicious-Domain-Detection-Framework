@@ -1,0 +1,7 @@
+{
+  "id": "microsoft-subdomain-spoof",
+  "title": "Subdomain Spoof: login.microsoftonline.com.account-reset.xyz",
+  "url": "https://login.microsoftonline.com.account-reset.xyz/oauth2/authorize",
+  "brand": "Microsoft",
+  "color": "#F59E0B"
+}

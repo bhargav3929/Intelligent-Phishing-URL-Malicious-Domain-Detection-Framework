@@ -7,3 +7,9 @@ __pycache__/
 *.db-shm
 *.db-journal
 .DS_Store
+*.db-journal
+.idea/
+.vscode/
+logs/
+*.log
+data/

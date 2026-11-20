@@ -2,19 +2,31 @@
 const $ = (s, r = document) => r.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const NODES = ["URL Gatekeeper & Anatomy Parser", "RDAP / WHOIS Domain Telemetry", "Live TLS/SSL Certificate Inspector", "AI Adversarial Brand & Phishing Classifier", "SOC Threat Brief & Persistence"];
-const SAMPLES = [
-  { label: "Verified Safe: github.com", url: "https://github.com/login", brand: "GitHub", c: "#10B981" },
-  { label: "Typosquat Trap: paypa1-secure-verify.com", url: "http://paypa1-secure-verify.com/auth/update-billing?session=98a7f6d5", brand: "PayPal", c: "#EF4444" },
-  { label: "Subdomain Spoof: login.microsoftonline.com.account-reset.xyz", url: "https://login.microsoftonline.com.account-reset.xyz/oauth2/authorize", brand: "Microsoft", c: "#F59E0B" },
-];
-const state = { scan: null, rate: null, rateAt: 0, busy: false, raw: [], timer: null };
+let SAMPLES = [];
+const state = { scan: null, rate: null, rateAt: 0, busy: false, raw: [], timer: null, info: null };
+
+/* ---------- demo ticket (kept for the session, removed from the address bar) ---------- */
+let TICKET = "";
+try {
+  const u = new URL(location.href), t = u.searchParams.get("ticket");
+  if (t) { sessionStorage.setItem("lastsem_ticket", t); u.searchParams.delete("ticket"); history.replaceState(null, "", u.pathname + u.search + u.hash); }
+  TICKET = sessionStorage.getItem("lastsem_ticket") || "";
+} catch { }
 
 /* ---------- helpers ---------- */
 const fmtTime = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-const api = async (path, opts) => { const r = await fetch(path, opts); return r; };
+const api = (path, opts = {}) => {
+  const headers = { ...(opts.headers || {}) };
+  if (TICKET) headers["X-LastSem-Ticket"] = TICKET;
+  return fetch(path, { ...opts, headers });
+};
 const verdictLabel = v => v === "MALICIOUS" ? "MALICIOUS PHISHING" : v;
 const col = v => v === "SAFE" ? "#10B981" : v === "SUSPICIOUS" ? "#F59E0B" : "#EF4444";
-function toast(msg, kind = "") { $("#errBox").innerHTML = msg ? `<div class="err ${kind}">${esc(msg)}</div>` : ""; }
+function toast(msg, kind = "", code = "") {
+  const needKey = !(state.info && state.info.mode === "demo") && (code === "AI_NOT_CONFIGURED" || code === "AI_KEY_INVALID");
+  $("#errBox").innerHTML = msg ? `<div class="err ${kind}">${esc(msg)}${needKey ? ' <button class="btn ghost" id="errKeys">Open API Keys</button>' : ""}</div>` : "";
+  if (needKey) $("#errKeys").onclick = () => $("#keysBtn").click();
+}
 function openEl(id) { $("#" + id).classList.add("open"); $("#scrim").classList.add("on"); }
 function closeAll() { document.querySelectorAll(".drawer.open,.modal.open").forEach(e => e.classList.remove("open")); $("#scrim").classList.remove("on"); }
 document.addEventListener("click", e => { const c = e.target.closest("[data-close]"); if (c) closeAll(); });
@@ -30,17 +42,31 @@ $("#tabs").onclick = e => {
 };
 
 /* ---------- samples ---------- */
-$("#samples").innerHTML = SAMPLES.map((s, i) => `<button class="chip" data-i="${i}"><i style="background:${s.c}"></i>${esc(s.label)}</button>`).join("");
-$("#samples").onclick = e => {
-  const b = e.target.closest(".chip"); if (!b) return;
+async function loadSamples() {
+  try { SAMPLES = (await (await api("api/samples")).json()).samples || []; } catch { SAMPLES = []; }
+  $("#samples").innerHTML = SAMPLES.map((s, i) => `<button class="chip" data-i="${i}"><i style="background:${esc(s.color)}"></i>${esc(s.title)}</button>`).join("");
+}
+// A sample shows its saved result instantly (no AI call). "Inspect Target URL" then runs it live.
+$("#samples").onclick = async e => {
+  const b = e.target.closest(".chip"); if (!b || state.busy) return;
   const s = SAMPLES[b.dataset.i];
-  $("#urlIn").value = s.url; $("#brandIn").value = s.brand;
+  $("#urlIn").value = s.input_text; $("#brandIn").value = s.brand || "";
+  toast("");
+  try {
+    const j = await (await api("api/samples/" + s.id)).json();
+    if (j.result) {
+      state.scan = j.result; renderAll(); renderLogs(j.result);
+      document.querySelector('#tabs button[data-tab="inspect"]').click();
+      bannerMsg("Saved sample result - press Inspect Target URL to run it live");
+      return;
+    }
+  } catch { }
   runScan();
 };
 
 /* ---------- rate pill ---------- */
 async function refreshRate() {
-  try { state.rate = await (await api("/api/rate")).json(); state.rateAt = Date.now(); } catch { }
+  try { state.rate = await (await api("api/rate")).json(); state.rateAt = Date.now(); } catch { }
   drawRate();
 }
 function drawRate() {
@@ -57,22 +83,25 @@ setInterval(refreshRate, 30000);
 
 /* ---------- keys ---------- */
 async function loadKeys() {
-  const k = await (await api("/api/keys")).json();
-  for (const n of ["groq", "ip2whois"]) $("#s_" + n).textContent = k[n].set ? `Saved: ${k[n].masked}` : "Not set";
-  const any = k.groq.set;
+  const r = await api("api/keys"); if (!r.ok) return;
+  const k = await r.json();
+  const srcTxt = { ui: "Saved in the app", env: "From .env" };
+  for (const n of ["groq", "ip2whois"]) $("#s_" + n).textContent = k[n].configured ? `${srcTxt[k[n].source] || "Set"}: ${k[n].masked}` : "Not set";
+  const any = k.groq.configured;
   $("#keyDot").className = "dot" + (any ? " ok" : "");
   $("#keyDot").title = any ? "AI key saved" : "No AI key — heuristic mode";
 }
 $("#keysBtn").onclick = () => { loadKeys(); $("#keysMsg").textContent = ""; openEl("keysModal"); };
 $("#saveKeys").onclick = async () => {
   const body = {};
-  for (const n of ["groq", "ip2whois"]) { const v = $("#k_" + n).value.trim(); if (v) body[n] = v; }
-  await api("/api/keys", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  for (const n of ["groq", "ip2whois"]) { const v = $("#k_" + n).value.trim(); if (v) body[n + "_api_key"] = v; }
+  const r = await api("api/keys", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!r.ok) { $("#keysMsg").textContent = (await r.json()).error; return; }
   ["groq", "ip2whois"].forEach(n => $("#k_" + n).value = "");
-  await loadKeys(); $("#keysMsg").textContent = "Saved.";
+  await loadKeys(); toast(""); $("#keysMsg").textContent = "Saved.";
 };
 $("#clearKeys").onclick = async () => {
-  await api("/api/keys", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ groq: "", ip2whois: "" }) });
+  await api("api/keys/groq", { method: "DELETE" }); await api("api/keys/ip2whois", { method: "DELETE" });
   await loadKeys(); $("#keysMsg").textContent = "Stored keys cleared (keys in .env still apply).";
 };
 
@@ -97,10 +126,13 @@ async function runScan() {
   let failed = true;
   try {
     st[1] = { status: "running", summary: "Parsing…" }; drawTracker(st);
-    const r = await fetch("/api/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url, brand }) });
-    if (r.status === 422) { const j = await r.json(); st[1] = { status: "error", summary: "Rejected" }; drawTracker(st); toast(j.detail); bannerMsg("Gatekeeper rejected input"); return; }
-    if (r.status === 429) { const j = await r.json(); toast(j.detail, "warn"); drawTracker(); refreshRate(); return; }
-    if (!r.ok) { toast("Server error " + r.status); drawTracker(); return; }
+    const r = await api("api/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url, brand }) });
+    if (!r.ok) {
+      const j = await r.json().catch(() => ({ error: "Server error " + r.status }));
+      if (j.code === "BAD_INPUT") { st[1] = { status: "error", summary: "Rejected" }; drawTracker(st); bannerMsg("Gatekeeper rejected input"); }
+      else drawTracker();
+      toast(j.error, r.status === 429 ? "warn" : "", j.code); refreshRate(); return;
+    }
     const reader = r.body.getReader(), dec = new TextDecoder(); let buf = "";
     for (; ;) {
       const { done, value } = await reader.read(); if (done) break;
@@ -110,8 +142,8 @@ async function runScan() {
         state.raw.push(line); const ev = JSON.parse(line);
         if (ev.type === "start") bannerMsg("Pipeline running: " + ev.url);
         else if (ev.type === "node") { st[ev.n] = { status: ev.status, summary: ev.summary, ms: ev.ms }; drawTracker(st); if (ev.status === "running") bannerMsg("Node " + ev.n + ": " + NODES[ev.n - 1]); }
-        else if (ev.type === "result") { state.scan = ev.result; failed = false; renderAll(); renderLogs(ev.result); }
-        else if (ev.type === "error") toast(ev.detail);
+        else if (ev.type === "result") { state.scan = ev.result; failed = false; renderAll(); renderLogs(ev.result); if (!ev.result.ai.ok && ev.result.ai.code) toast(ev.result.ai.error, "warn", ev.result.ai.code); }
+        else if (ev.type === "error") toast(ev.error, "", ev.code);
       }
     }
   } catch (err) { toast("Request failed: " + err.message); }
@@ -233,14 +265,14 @@ $("#view-inspect").innerHTML = `<div class="card empty"><b>Awaiting target.</b><
 
 /* ---------- history ---------- */
 async function loadHistory() {
-  const rows = await (await api("/api/history")).json();
+  const rows = await (await api("api/history")).json();
   $("#histList").innerHTML = rows.length ? rows.map(r => `<div class="hist" data-id="${r.id}"><div class="u">${esc(r.url)}</div><div class="m"><span class="c-${r.verdict}">${r.verdict} · ${r.score}</span><span>${new Date(r.created_at * 1000).toLocaleString()}</span></div></div>`).join("") : `<div class="empty">No scans yet.</div>`;
   return rows;
 }
 $("#histBtn").onclick = async () => { await loadHistory(); openEl("histDrawer"); };
 $("#histList").onclick = async e => {
   const h = e.target.closest(".hist"); if (!h) return;
-  state.scan = await (await api("/api/scans/" + h.dataset.id)).json();
+  state.scan = await (await api("api/scans/" + h.dataset.id)).json();
   renderAll(); closeAll();
   document.querySelector('#tabs button[data-tab="inspect"]').click();
 };
@@ -252,7 +284,7 @@ async function renderCompare() {
   const opts = sel => rows.map((r, i) => `<option value="${r.id}" ${i === sel ? "selected" : ""}>#${r.id} · ${r.verdict} ${r.score} · ${esc(r.url.slice(0, 60))}</option>`).join("");
   v.innerHTML = `<div class="card cmp-pick"><select id="selA">${opts(1)}</select><select id="selB">${opts(0)}</select></div><div class="card" style="margin-top:14px" id="cmpOut"></div>`;
   const go = async () => {
-    const [a, b] = await Promise.all(["selA", "selB"].map(id => api("/api/scans/" + $("#" + id).value).then(r => r.json())));
+    const [a, b] = await Promise.all(["selA", "selB"].map(id => api("api/scans/" + $("#" + id).value).then(r => r.json())));
     const row = (label, fa, fb, cmp) => {
       const A = fa(a), B = fb ? fb(b) : fa(b); let ca = "", cb = "";
       if (cmp) { const r = cmp(A, B); if (r > 0) { ca = "worse"; cb = "better"; } else if (r < 0) { ca = "better"; cb = "worse"; } }
@@ -276,4 +308,9 @@ async function renderCompare() {
 }
 
 /* ---------- init ---------- */
-refreshRate(); loadKeys();
+(async () => {
+  try { state.info = await (await api("api/info")).json(); } catch { }
+  if (state.info && state.info.mode === "demo") { $("#keysBtn").style.display = "none"; if (!TICKET) $("#intakeNote").textContent = "Samples only - sign in on lastsem.com to try your own input"; }
+  else loadKeys();
+  loadSamples(); refreshRate();
+})();

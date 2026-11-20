@@ -599,7 +599,7 @@ async def _timed_tls(an):
     return out
 
 
-async def run_pipeline(an: dict, brand_input: str, keys: dict):
+async def run_pipeline(an: dict, brand_input: str, keys: dict, owner: str = "local"):
     """Async generator yielding NDJSON events: start -> node* -> result."""
     t0 = time.perf_counter()
     node_ms = {1: int(an.get("ms", 0))}
@@ -639,15 +639,14 @@ async def run_pipeline(an: dict, brand_input: str, keys: dict):
     yield {"type": "node", "n": 4, "status": "running", "t": el()}
     t4 = time.perf_counter()
     base = baseline(an, rd, tl)
-    ai_out = {"provider": "heuristic-engine", "ok": False, "error": "", "fallback": False, "attempts": []}
+    ai_out = {"provider": "heuristic-engine", "ok": False, "error": "", "code": "", "fallback": False, "attempts": []}
     final_score = base["score"]
     vector = heuristic_vector(an, base["score"])
     brand = (an["brand_candidates"][0].title() if an["brand_candidates"] else None)
     if brand_input and base["score"] >= 30:
         brand = brand or brand_input.strip()
     try:
-        text, provider, meta = await ai.classify(AI_SYSTEM, ai_prompt(an, rd, tl, base, brand_input), keys)
-        j = ai.parse_json(text)
+        j, provider, meta = await ai.classify_json(AI_SYSTEM, ai_prompt(an, rd, tl, base, brand_input), keys.get("GROQ_API_KEY", ""))
         ai_score = int(max(0, min(100, float(j.get("risk_score", base["score"])))))
         final_score = max(base["score"] - 30, min(base["score"] + 30, ai_score))  # AI refines, can't wildly contradict hard evidence
         if j.get("attack_vector") in VECTORS:
@@ -660,11 +659,13 @@ async def run_pipeline(an: dict, brand_input: str, keys: dict):
                   "reasoning": str(j.get("reasoning", ""))[:1200], "red_flags": [str(x) for x in j.get("red_flags", [])][:10],
                   "recommended_actions": [str(x) for x in j.get("recommended_actions", [])][:8], "error": "",
                   "fallback": meta["fallback"], "attempts": meta["attempts"]}
-    except ai.NoProvider as e:
-        ai_out["error"] = str(e)
+    except ai.AIError as e:
+        ai_out["error"] = str(e)  # plain-English message, never the raw provider error
+        ai_out["code"] = e.code
         ai_out["attempts"] = list(e.attempts)
-    except (ValueError, KeyError, TypeError) as e:
-        ai_out["error"] = f"AI response unparseable ({type(e).__name__})"
+    except (ValueError, KeyError, TypeError):
+        ai_out["error"] = ai.MESSAGES["AI_FAILED"]
+        ai_out["code"] = "AI_FAILED"
     # Hard rule constraints always win over the AI refinement
     final_score = max(final_score, base["floor"])
     if base["cap"] is not None:
@@ -694,7 +695,7 @@ async def run_pipeline(an: dict, brand_input: str, keys: dict):
     }
     res["soc"] = soc_rules(res)
     res["report_md"] = build_report(res)
-    res["id"] = db.save_scan(res)
+    res["id"] = db.save_scan(res, owner)
     node_ms[5] = _ms(t5)
     res["duration_ms"] = _ms(t0) + node_ms[1]
     res["debug"] = {"node_ms": node_ms, "rdap_ms": rd["probe_ms"], "tls_ms": tl["probe_ms"],
