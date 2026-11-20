@@ -7,14 +7,14 @@ from pathlib import Path
 
 DB_PATH = Path(__file__).resolve().parent.parent / "phishradar.db"
 WINDOW_SECONDS = 3600
-KEY_NAMES = ("GEMINI_API_KEY", "GROQ_API_KEY", "IP2WHOIS_API_KEY")
+KEY_NAMES = ("GROQ_API_KEY", "IP2WHOIS_API_KEY")
 
 
 def _limit() -> int:
     try:
-        return max(1, int(os.getenv("DEMO_SCAN_LIMIT", "5")))
+        return max(1, int(os.getenv("DEMO_SCAN_LIMIT", "15")))
     except ValueError:
-        return 5
+        return 15
 
 
 def conn() -> sqlite3.Connection:

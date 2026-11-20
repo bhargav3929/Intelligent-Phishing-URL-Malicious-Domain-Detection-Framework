@@ -1,4 +1,4 @@
-"""Node 4 LLM access: one structured JSON call, hedged provider race (Gemini first, Groq on error/slow), circuit breaker. Pure httpx."""
+"""Node 4 LLM access: one structured JSON call to Groq with automatic model fallback and a circuit breaker. Pure httpx."""
 import asyncio
 import json
 import os
@@ -7,11 +7,9 @@ import time
 
 import httpx
 
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 MAX_OUTPUT_TOKENS = 900
 TOTAL_TIMEOUT = 18.0
-HEDGE_AFTER = 5.0
 BREAKER_SECONDS = 120.0
 
 _breaker: dict = {}  # provider -> monotonic time until which it is skipped
@@ -24,10 +22,11 @@ class NoProvider(Exception):
 
 
 def _models():
-    return {
-        "gemini": [os.getenv("GEMINI_MODEL", "gemini-3.8-flash")],
-        "groq": [os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"), os.getenv("GROQ_FALLBACK_MODEL", "qwen/qwen3.8-27b")],
-    }
+    return [
+        os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
+        os.getenv("GROQ_FALLBACK_MODEL", "qwen/qwen3.8-27b"),
+        os.getenv("GROQ_FALLBACK_MODEL_2", "llama-3.3-70b-versatile"),
+    ]
 
 
 def _tripped(provider: str) -> bool:
@@ -36,19 +35,6 @@ def _tripped(provider: str) -> bool:
 
 def _trip(provider: str) -> None:
     _breaker[provider] = time.monotonic() + BREAKER_SECONDS
-
-
-async def _gemini(client, key, model, system, prompt):
-    body = {
-        "systemInstruction": {"parts": [{"text": system}]},
-        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.2, "maxOutputTokens": MAX_OUTPUT_TOKENS, "responseMimeType": "application/json"},
-    }
-    r = await client.post(GEMINI_URL.format(model=model), params={"key": key}, json=body)
-    if r.status_code != 200:
-        return r.status_code, None
-    parts = r.json()["candidates"][0]["content"]["parts"]
-    return 200, "".join(p.get("text", "") for p in parts)
 
 
 async def _groq(client, key, model, system, prompt):
@@ -90,61 +76,24 @@ async def _run_provider(provider, fn, key, models, system, prompt, attempts, tim
 
 async def classify(system: str, prompt: str, keys: dict):
     """Returns (text, provider_label, meta). meta = {fallback: bool, attempts: [...]}. Raises NoProvider."""
-    models = _models()
+    key = keys.get("GROQ_API_KEY")
     attempts: list = []
-    avail = []
-    for provider, key_name, fn in (("gemini", "GEMINI_API_KEY", _gemini), ("groq", "GROQ_API_KEY", _groq)):
-        if keys.get(key_name):
-            avail.append((provider, fn, keys[key_name]))
-    if not avail:
-        raise NoProvider("No AI API key configured", attempts)
-    live = [a for a in avail if not _tripped(a[0])] or avail  # if every provider is tripped, try anyway
-    for a in avail:
-        if a not in live:
-            attempts.append({"provider": a[0], "ok": False, "ms": 0, "error": "circuit open (120s)"})
-
-    deadline = time.monotonic() + TOTAL_TIMEOUT
-    tasks: dict = {}
-
-    def start(entry):
-        provider, fn, key = entry
-        t = asyncio.create_task(_run_provider(provider, fn, key, models[provider], system, prompt, attempts, TOTAL_TIMEOUT))
-        tasks[t] = provider
-
-    start(live[0])
-    hedge = live[1] if len(live) > 1 else None
-    hedge_at = time.monotonic() + HEDGE_AFTER
-    errors = []
+    if not key:
+        raise NoProvider("No Groq API key configured", attempts)
+    if _tripped("groq"):
+        attempts.append({"provider": "groq", "ok": False, "ms": 0, "error": "circuit open (120s)"})
+        raise NoProvider("Groq circuit open", attempts)
     try:
-        while tasks:
-            now = time.monotonic()
-            if now >= deadline:
-                break
-            wait_for = deadline - now
-            if hedge and hedge_at > now:
-                wait_for = min(wait_for, hedge_at - now)
-            done, _ = await asyncio.wait(set(tasks), timeout=wait_for, return_when=asyncio.FIRST_COMPLETED)
-            for d in done:
-                provider = tasks.pop(d)
-                try:
-                    text, label, model_fallback = d.result()
-                except RuntimeError as e:
-                    _trip(provider)
-                    errors.append(str(e))
-                    continue
-                return text, label, {"fallback": provider == "groq" or model_fallback, "attempts": attempts}
-            if hedge and (not tasks or time.monotonic() >= hedge_at):  # primary failed or exceeded 5s -> launch hedge
-                start(hedge)
-                hedge = None
-    finally:
-        timed_out = time.monotonic() >= deadline
-        for t, provider in list(tasks.items()):
-            if not t.done():
-                t.cancel()
-                if timed_out:
-                    _trip(provider)
-                    attempts.append({"provider": provider, "ok": False, "ms": int(TOTAL_TIMEOUT * 1000), "error": "timeout"})
-    raise NoProvider("; ".join(errors) or "AI providers timed out", attempts)
+        text, label, model_fallback = await asyncio.wait_for(
+            _run_provider("groq", _groq, key, _models(), system, prompt, attempts, TOTAL_TIMEOUT), TOTAL_TIMEOUT)
+    except asyncio.TimeoutError:
+        _trip("groq")
+        attempts.append({"provider": "groq", "ok": False, "ms": int(TOTAL_TIMEOUT * 1000), "error": "timeout"})
+        raise NoProvider("Groq timed out", attempts)
+    except RuntimeError as e:
+        _trip("groq")
+        raise NoProvider(str(e), attempts)
+    return text, label, {"fallback": model_fallback, "attempts": attempts}
 
 
 def parse_json(text: str) -> dict:

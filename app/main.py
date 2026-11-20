@@ -29,7 +29,6 @@ class ScanReq(BaseModel):
 
 
 class KeysReq(BaseModel):
-    gemini: str | None = None
     groq: str | None = None
     ip2whois: str | None = None
 
@@ -107,13 +106,13 @@ def _mask(v: str) -> str:
 @app.get("/api/keys")
 def keys_status():
     k = db.all_keys()
-    return {n: {"set": bool(k[e]), "masked": _mask(k[e])} for n, e in (("gemini", "GEMINI_API_KEY"), ("groq", "GROQ_API_KEY"), ("ip2whois", "IP2WHOIS_API_KEY"))}
+    return {n: {"set": bool(k[e]), "masked": _mask(k[e])} for n, e in (("groq", "GROQ_API_KEY"), ("ip2whois", "IP2WHOIS_API_KEY"))}
 
 
 @app.post("/api/keys")
 def save_keys(req: KeysReq):
     # None = leave unchanged, "" = clear, otherwise save
-    for field, name in (("gemini", "GEMINI_API_KEY"), ("groq", "GROQ_API_KEY"), ("ip2whois", "IP2WHOIS_API_KEY")):
+    for field, name in (("groq", "GROQ_API_KEY"), ("ip2whois", "IP2WHOIS_API_KEY")):
         v = getattr(req, field)
         if v is not None:
             db.set_key(name, v.strip()[:200])

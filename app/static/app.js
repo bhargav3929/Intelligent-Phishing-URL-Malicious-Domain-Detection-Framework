@@ -58,21 +58,21 @@ setInterval(refreshRate, 30000);
 /* ---------- keys ---------- */
 async function loadKeys() {
   const k = await (await api("/api/keys")).json();
-  for (const n of ["gemini", "groq", "ip2whois"]) $("#s_" + n).textContent = k[n].set ? `Saved: ${k[n].masked}` : "Not set";
-  const any = k.gemini.set || k.groq.set;
+  for (const n of ["groq", "ip2whois"]) $("#s_" + n).textContent = k[n].set ? `Saved: ${k[n].masked}` : "Not set";
+  const any = k.groq.set;
   $("#keyDot").className = "dot" + (any ? " ok" : "");
   $("#keyDot").title = any ? "AI key saved" : "No AI key — heuristic mode";
 }
 $("#keysBtn").onclick = () => { loadKeys(); $("#keysMsg").textContent = ""; openEl("keysModal"); };
 $("#saveKeys").onclick = async () => {
   const body = {};
-  for (const n of ["gemini", "groq", "ip2whois"]) { const v = $("#k_" + n).value.trim(); if (v) body[n] = v; }
+  for (const n of ["groq", "ip2whois"]) { const v = $("#k_" + n).value.trim(); if (v) body[n] = v; }
   await api("/api/keys", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  ["gemini", "groq", "ip2whois"].forEach(n => $("#k_" + n).value = "");
+  ["groq", "ip2whois"].forEach(n => $("#k_" + n).value = "");
   await loadKeys(); $("#keysMsg").textContent = "Saved.";
 };
 $("#clearKeys").onclick = async () => {
-  await api("/api/keys", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ gemini: "", groq: "", ip2whois: "" }) });
+  await api("/api/keys", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ groq: "", ip2whois: "" }) });
   await loadKeys(); $("#keysMsg").textContent = "Stored keys cleared (keys in .env still apply).";
 };
 
@@ -171,7 +171,7 @@ function renderInspect() {
         <span class="badge">${s.duration_ms} ms</span>
       </div>
       <div class="mono" style="word-break:break-all;margin-bottom:8px">${esc(s.defanged)}</div>
-      <div class="reason">${esc(s.ai.reasoning || "Deterministic engine verdict — add a Gemini or Groq key in “API Keys” for AI adversarial reasoning.")}
+      <div class="reason">${esc(s.ai.reasoning || "Deterministic engine verdict — add a Groq key in “API Keys” for AI adversarial reasoning.")}
         ${s.ai.ok ? "" : `<small>AI unavailable: ${esc(s.ai.error || "no key configured")}</small>`}</div>
     </div>
   </div>

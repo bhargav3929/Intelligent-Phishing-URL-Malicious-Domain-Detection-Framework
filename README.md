@@ -19,7 +19,7 @@ Needs Python 3.10+. **No API key is required.** Without one, the deterministic e
 | 1 | URL Gatekeeper & Anatomy Parser | Rejects non-URLs; splits scheme / subdomains / registrable domain / TLD / path / query; checks IP-literal, `@`, punycode, brand look-alikes (homoglyph, typosquat, subdomain spoof); Shannon entropy |
 | 2 | RDAP / WHOIS Telemetry | `rdap.org`, 4s timeout, run in parallel with Node 3 (or IP2WHOIS if a key is set, with silent RDAP fallback): registrar, creation date, age, newly-registered (<90d) and NXDOMAIN flags |
 | 3 | Live TLS Inspector | Real handshake on :443 (3.5s timeout) with `ssl` + `socket`: issuer, validity, days left, SAN count, self-signed / expired / mismatch. Probes to private IPs are blocked. |
-| 4 | AI Brand & Phishing Classifier | One structured JSON call (900 max tokens, 18s cap). Hedged race: Gemini `gemini-3.8-flash` first; Groq `openai/gpt-oss-120b` (fallback `qwen/qwen3.8-27b`) launches in parallel if Gemini errors or exceeds 5s. Failed providers are skipped for 120s (circuit breaker). The AI score can move at most ±30 from the deterministic evidence score. |
+| 4 | AI Brand & Phishing Classifier | One structured JSON call (900 max tokens, 18s cap). Groq-only: `openai/gpt-oss-120b` with automatic fallback to `qwen/qwen3.8-27b`, then `llama-3.3-70b-versatile`. A failing provider is skipped for 120s (circuit breaker). The AI score can move at most ±30 from the deterministic evidence score. |
 | 5 | SOC Brief & Persistence | DNS / proxy / email / firewall rules, abuse-report text, defanged IOCs; saved to SQLite |
 
 Responses stream as NDJSON (`start` → `node` → `result`); a full scan takes roughly 5–12s.
@@ -28,7 +28,7 @@ Responses stream as NDJSON (`start` → `node` → `result`); a full scan takes 
 
 - **Tabs:** Single URL Inspector · URL Diff & Compare (any two history scans) · IOC Threat Report (Copy Defanged IOCs, Download `.md`)
 - **Live timer + Execution & Debug Logs:** a 0.1s-tick elapsed timer on the pipeline banner, plus a collapsible panel with per-node ms, RDAP/TLS probe latency, active AI provider (tagged `(fallback)` if Groq answered) and raw NDJSON events.
-- **Demo rate limit:** a sliding window of 5 scans per hour (SQLite), returning HTTP 429 with the minutes and seconds left. Invalid input never uses a slot. Change the limit with `DEMO_SCAN_LIMIT`.
+- **Demo rate limit:** a sliding window of 15 scans per hour (SQLite), returning HTTP 429 with the minutes and seconds left. Invalid input never uses a slot. Change the limit with `DEMO_SCAN_LIMIT`.
 - **BYOK:** the *API Keys* modal saves keys to `phishradar.db`; `.env` also works (see `.env.example`). The dot is green when an AI key is available.
 
 ## Dependencies
@@ -38,7 +38,7 @@ Responses stream as NDJSON (`start` → `node` → `result`); a full scan takes 
 ## Troubleshooting
 
 - **Smart App Control blocks a `.pyd` on startup:** `pydantic-core` is the one unavoidable compiled dependency of FastAPI. Run on Linux/WSL with `start.sh`, or turn off Smart App Control.
-- **Every URL says "no AI key":** add a Gemini or Groq key. The model names are configurable in `.env` if your account exposes different ones.
+- **Every URL says "no AI key":** add a Groq key (`GROQ_API_KEY`). The model names are configurable in `.env` if your account exposes different ones.
 - **RDAP shows "unavailable":** some registries rate-limit `rdap.org`. Retry later, or add an IP2WHOIS key.
 
 ## Safety notes
