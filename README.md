@@ -71,3 +71,11 @@ Results stream to the page step by step, so you see each step finish.
 - **RDAP shows "unavailable":** `rdap.org` is rate-limiting you. Try again later, or add an IP2WHOIS key in **API Keys**.
 
 All indicators are defanged (`hxxp[://]evil[.]com`). The sample typosquat and spoof domains are expected to be unregistered.
+
+Run the Commands:
+
+Windows (PowerShell):
+python -m venv .venv; .\.venv\Scripts\python.exe -m pip install -r requirements.txt; .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8003
+
+macOS / Linux (Terminal):
+python3 -m venv .venv && ./.venv/bin/python -m pip install -r requirements.txt && ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8003
