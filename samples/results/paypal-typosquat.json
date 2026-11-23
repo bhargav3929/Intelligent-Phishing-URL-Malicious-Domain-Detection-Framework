@@ -1,182 +1,207 @@
 {
- "created_at": 1795185916.346315,
- "url": "http://paypa1-secure-verify.com/auth/update-billing?session=98a7f6d5",
- "brand_input": "PayPal",
- "defanged": "hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5",
- "verdict": "MALICIOUS",
- "risk_score": 100,
- "attack_vector": "Typosquatting",
- "impersonated_brand": "Paypal",
- "anatomy": {
-  "ok": true,
-  "normalized_url": "http://paypa1-secure-verify.com/auth/update-billing?session=98a7f6d5",
-  "note": "",
-  "scheme": "http",
-  "host": "paypa1-secure-verify.com",
-  "port": null,
-  "subdomains": [],
-  "registrable_domain": "paypa1-secure-verify.com",
-  "tld": "com",
-  "root_label": "paypa1-secure-verify",
-  "path": "/auth/update-billing",
-  "query": "session=98a7f6d5",
-  "query_params": [
-   {
-    "key": "session",
-    "value": "98a7f6d5"
-   }
-  ],
-  "is_ip": false,
-  "has_at_symbol": false,
-  "has_punycode": false,
-  "has_brand_spoof": true,
-  "host_entropy": 3.584,
-  "query_entropy": 3.59,
-  "keywords": [
-   "billing",
-   "secure",
-   "update",
-   "verify"
-  ],
-  "brand_candidates": [
-   "paypal"
-  ],
+  "created_at": 1795444364.4163098,
+  "url": "http://paypa1-secure-verify.com/auth/update-billing?session=98a7f6d5",
+  "brand_input": "PayPal",
+  "defanged": "hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5",
+  "verdict": "MALICIOUS",
+  "risk_score": 100,
+  "attack_vector": "Credential Harvesting",
+  "impersonated_brand": "PayPal",
+  "anatomy": {
+    "ok": true,
+    "normalized_url": "http://paypa1-secure-verify.com/auth/update-billing?session=98a7f6d5",
+    "note": "",
+    "scheme": "http",
+    "host": "paypa1-secure-verify.com",
+    "port": null,
+    "subdomains": [],
+    "registrable_domain": "paypa1-secure-verify.com",
+    "tld": "com",
+    "root_label": "paypa1-secure-verify",
+    "path": "/auth/update-billing",
+    "query": "session=98a7f6d5",
+    "query_params": [
+      {
+        "key": "session",
+        "value": "98a7f6d5"
+      }
+    ],
+    "is_ip": false,
+    "has_at_symbol": false,
+    "has_punycode": false,
+    "has_brand_spoof": true,
+    "host_entropy": 3.584,
+    "query_entropy": 3.59,
+    "keywords": [
+      "billing",
+      "secure",
+      "update",
+      "verify"
+    ],
+    "brand_candidates": [
+      "paypal"
+    ],
+    "flags": [
+      {
+        "sev": "low",
+        "part": "path",
+        "text": "High-entropy query string (3.59 bits) — tracking/session token",
+        "pts": 8
+      },
+      {
+        "sev": "med",
+        "part": "path",
+        "text": "Credential-lure keywords: billing, secure, update, verify",
+        "pts": 20
+      },
+      {
+        "sev": "high",
+        "part": "domain",
+        "text": "Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule]",
+        "pts": 55
+      }
+    ]
+  },
+  "rdap": {
+    "source": "rdap.org",
+    "status": "unregistered",
+    "registrar": "",
+    "created": "",
+    "expires": "",
+    "age_days": null,
+    "newly_registered": false,
+    "detail": "Domain not found in RDAP — unregistered / NXDOMAIN target.",
+    "probe_ms": 1140
+  },
+  "tls": {
+    "status": "no_dns",
+    "https_enforced": false,
+    "issuer": "",
+    "subject": "",
+    "valid_from": "",
+    "valid_to": "",
+    "days_remaining": null,
+    "san_count": 0,
+    "tls_version": "",
+    "self_signed": false,
+    "expired": false,
+    "hostname_mismatch": false,
+    "detail": "Host does not resolve (NXDOMAIN) — TLS probe skipped.",
+    "probe_ms": 141
+  },
+  "ai": {
+    "provider": "groq/openai/gpt-oss-120b",
+    "ok": true,
+    "ai_score": 100,
+    "confidence": 1.0,
+    "reasoning": "The URL uses a leet‑spelled domain paypa1-secure-verify.com that does not resolve, indicating a newly registered or unregistered typosquatted domain. It serves over unencrypted HTTP and contains credential‑lure keywords (billing, secure, update, verify) with a high‑entropy session token. These deterministic flags strongly indicate a phishing attempt to harvest PayPal credentials. The combination of brand spoofing, lack of TLS, and malicious query confirms a high‑risk phishing URL.",
+    "red_flags": [
+      "Unregistered domain",
+      "HTTP (no TLS)",
+      "Leet typo in brand",
+      "Credential lure keywords",
+      "High entropy query"
+    ],
+    "recommended_actions": [
+      "Block URL",
+      "Alert SOC",
+      "Add to blocklist",
+      "Investigate affected user"
+    ],
+    "error": "",
+    "fallback": false,
+    "attempts": [
+      {
+        "provider": "groq/openai/gpt-oss-120b",
+        "ok": true,
+        "ms": 2012
+      }
+    ]
+  },
+  "baseline_score": 100,
   "flags": [
-   {
-    "sev": "low",
-    "part": "path",
-    "text": "High-entropy query string (3.59 bits) \u2014 tracking/session token",
-    "pts": 8
-   },
-   {
-    "sev": "med",
-    "part": "path",
-    "text": "Credential-lure keywords: billing, secure, update, verify",
-    "pts": 20
-   },
-   {
-    "sev": "high",
-    "part": "domain",
-    "text": "Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule]",
-    "pts": 55
-   }
+    {
+      "sev": "low",
+      "part": "path",
+      "text": "High-entropy query string (3.59 bits) — tracking/session token",
+      "pts": 8
+    },
+    {
+      "sev": "med",
+      "part": "path",
+      "text": "Credential-lure keywords: billing, secure, update, verify",
+      "pts": 20
+    },
+    {
+      "sev": "high",
+      "part": "domain",
+      "text": "Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule]",
+      "pts": 55
+    },
+    {
+      "sev": "high",
+      "part": "infra",
+      "text": "Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords",
+      "pts": 55
+    },
+    {
+      "sev": "high",
+      "part": "infra",
+      "text": "Domain is unregistered / NXDOMAIN",
+      "pts": 25
+    }
   ],
-  "ms": 1
- },
- "rdap": {
-  "source": "rdap.org",
-  "status": "unregistered",
-  "registrar": "",
-  "created": "",
-  "expires": "",
-  "age_days": null,
-  "newly_registered": false,
-  "detail": "Domain not found in RDAP \u2014 unregistered / NXDOMAIN target.",
-  "probe_ms": 1046
- },
- "tls": {
-  "status": "no_dns",
-  "https_enforced": false,
-  "issuer": "",
-  "subject": "",
-  "valid_from": "",
-  "valid_to": "",
-  "days_remaining": null,
-  "san_count": 0,
-  "tls_version": "",
-  "self_signed": false,
-  "expired": false,
-  "hostname_mismatch": false,
-  "detail": "Host does not resolve (NXDOMAIN) \u2014 TLS probe skipped.",
-  "probe_ms": 130
- },
- "ai": {
-  "provider": "heuristic-engine",
-  "ok": false,
-  "error": "No Groq key is set. Open API Keys and paste a free key from console.groq.com/keys.",
-  "code": "AI_NOT_CONFIGURED",
-  "fallback": false,
-  "attempts": []
- },
- "baseline_score": 100,
- "flags": [
-  {
-   "sev": "low",
-   "part": "path",
-   "text": "High-entropy query string (3.59 bits) \u2014 tracking/session token",
-   "pts": 8
-  },
-  {
-   "sev": "med",
-   "part": "path",
-   "text": "Credential-lure keywords: billing, secure, update, verify",
-   "pts": 20
-  },
-  {
-   "sev": "high",
-   "part": "domain",
-   "text": "Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule]",
-   "pts": 55
-  },
-  {
-   "sev": "high",
-   "part": "infra",
-   "text": "Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords",
-   "pts": 55
-  },
-  {
-   "sev": "high",
-   "part": "infra",
-   "text": "Domain is unregistered / NXDOMAIN",
-   "pts": 25
-  }
- ],
- "rules_triggered": [
-  "High-entropy query string (3.59 bits) \u2014 tracking/session token (+8)",
-  "Credential-lure keywords: billing, secure, update, verify (+20)",
-  "Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule] (+55)",
-  "Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords (+55)",
-  "Domain is unregistered / NXDOMAIN (+25)",
-  "Not eligible for SAFE: not https, TLS check 'no_dns', domain not established, spoofing/obfuscation/high-abuse-TLD flag",
-  "Final verdict: MALICIOUS PHISHING (risk 100/100, rule floor 75)"
- ],
- "duration_ms": 1055,
- "soc": {
-  "rules": [
-   "DNS: sinkhole/block paypa1-secure-verify[.]com and all subdomains (*.paypa1-secure-verify[.]com).",
-   "Proxy/Web gateway: block URL hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5.",
-   "Email gateway: quarantine messages containing the URL; purge delivered copies from mailboxes.",
-   "Hunt: search proxy/DNS logs for the last 30 days for hosts that resolved the domain; reset credentials of any user who submitted a form.",
-   "Submit to Google Safe Browsing, Microsoft SmartScreen and PhishTank for takedown."
-  ],
-  "abuse_report": "Subject: Phishing / abuse report for paypa1-secure-verify[.]com\n\nTo the abuse team at the domain registrar,\n\nThe domain paypa1-secure-verify[.]com is hosting content assessed as Typosquatting (MALICIOUS, risk 100/100), impersonating Paypal. Reported URL: hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5\nEvidence: High-entropy query string (3.59 bits) \u2014 tracking/session token; Credential-lure keywords: billing, secure, update, verify; Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule]; Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords; Domain is unregistered / NXDOMAIN.\n\nPlease suspend the domain and preserve logs. Report generated by PhishRadar.",
-  "iocs": [
-   "hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5",
-   "paypa1-secure-verify[.]com"
-  ]
- },
- "report_md": "# PhishRadar \u2014 SOC Threat Intelligence Brief\n\n**Generated:** 2026-11-20 14:45 UTC  \n**Verdict:** MALICIOUS \u2014 risk score 100/100  \n**Attack vector:** Typosquatting  \n**Impersonated brand:** Paypal  \n**Analysis engine:** heuristic-engine\n\n## Target\n- Defanged URL: `hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5`\n- Registrable domain: `paypa1-secure-verify[.]com`\n- Host: `paypa1-secure-verify[.]com`\n\n## Assessment\nDeterministic engine verdict (no AI provider available).\n\n## Red flags\n- [LOW] High-entropy query string (3.59 bits) \u2014 tracking/session token\n- [MED] Credential-lure keywords: billing, secure, update, verify\n- [HIGH] Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule]\n- [HIGH] Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords\n- [HIGH] Domain is unregistered / NXDOMAIN\n\n## Telemetry\n- Domain age: unregistered | Registrar: n/a | Created: n/a\n- TLS: no_dns | Issuer: n/a | Valid to: n/a | Days left: None\n- Entropy \u2014 host label 3.584 bits, query 3.59 bits\n\n## Indicators of Compromise (defanged)\n- `hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5`\n- `paypa1-secure-verify[.]com`\n\n## Mitigation steps\n1. DNS: sinkhole/block paypa1-secure-verify[.]com and all subdomains (*.paypa1-secure-verify[.]com).\n2. Proxy/Web gateway: block URL hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5.\n3. Email gateway: quarantine messages containing the URL; purge delivered copies from mailboxes.\n4. Hunt: search proxy/DNS logs for the last 30 days for hosts that resolved the domain; reset credentials of any user who submitted a form.\n5. Submit to Google Safe Browsing, Microsoft SmartScreen and PhishTank for takedown.\n\n## Abuse-contact report\n```\nSubject: Phishing / abuse report for paypa1-secure-verify[.]com\n\nTo the abuse team at the domain registrar,\n\nThe domain paypa1-secure-verify[.]com is hosting content assessed as Typosquatting (MALICIOUS, risk 100/100), impersonating Paypal. Reported URL: hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5\nEvidence: High-entropy query string (3.59 bits) \u2014 tracking/session token; Credential-lure keywords: billing, secure, update, verify; Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule]; Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords; Domain is unregistered / NXDOMAIN.\n\nPlease suspend the domain and preserve logs. Report generated by PhishRadar.\n```\n",
- "id": 0,
- "debug": {
-  "node_ms": {
-   "1": 1,
-   "3": 130,
-   "2": 1046,
-   "4": 0,
-   "5": 7
-  },
-  "rdap_ms": 1046,
-  "tls_ms": 130,
-  "ai_attempts": [],
   "rules_triggered": [
-   "High-entropy query string (3.59 bits) \u2014 tracking/session token (+8)",
-   "Credential-lure keywords: billing, secure, update, verify (+20)",
-   "Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule] (+55)",
-   "Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords (+55)",
-   "Domain is unregistered / NXDOMAIN (+25)",
-   "Not eligible for SAFE: not https, TLS check 'no_dns', domain not established, spoofing/obfuscation/high-abuse-TLD flag",
-   "Final verdict: MALICIOUS PHISHING (risk 100/100, rule floor 75)"
+    "High-entropy query string (3.59 bits) — tracking/session token (+8)",
+    "Credential-lure keywords: billing, secure, update, verify (+20)",
+    "Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule] (+55)",
+    "Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords (+55)",
+    "Domain is unregistered / NXDOMAIN (+25)",
+    "Not eligible for SAFE: not https, TLS check 'no_dns', domain not established, spoofing/obfuscation/high-abuse-TLD flag",
+    "Final verdict: MALICIOUS PHISHING (risk 100/100, rule floor 75)"
   ],
-  "total_ms": 1055
- }
+  "duration_ms": 3386,
+  "soc": {
+    "rules": [
+      "DNS: sinkhole/block paypa1-secure-verify[.]com and all subdomains (*.paypa1-secure-verify[.]com).",
+      "Proxy/Web gateway: block URL hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5.",
+      "Email gateway: quarantine messages containing the URL; purge delivered copies from mailboxes.",
+      "Hunt: search proxy/DNS logs for the last 30 days for hosts that resolved the domain; reset credentials of any user who submitted a form.",
+      "Submit to Google Safe Browsing, Microsoft SmartScreen and PhishTank for takedown."
+    ],
+    "abuse_report": "Subject: Phishing / abuse report for paypa1-secure-verify[.]com\n\nTo the abuse team at the domain registrar,\n\nThe domain paypa1-secure-verify[.]com is hosting content assessed as Credential Harvesting (MALICIOUS, risk 100/100), impersonating PayPal. Reported URL: hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5\nEvidence: High-entropy query string (3.59 bits) — tracking/session token; Credential-lure keywords: billing, secure, update, verify; Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule]; Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords; Domain is unregistered / NXDOMAIN.\n\nPlease suspend the domain and preserve logs. Report generated by PhishRadar.",
+    "iocs": [
+      "hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5",
+      "paypa1-secure-verify[.]com"
+    ]
+  },
+  "report_md": "# PhishRadar — SOC Threat Intelligence Brief\n\n**Generated:** 2026-11-23 14:32 UTC  \n**Verdict:** MALICIOUS — risk score 100/100  \n**Attack vector:** Credential Harvesting  \n**Impersonated brand:** PayPal  \n**Analysis engine:** groq/openai/gpt-oss-120b\n\n## Target\n- Defanged URL: `hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5`\n- Registrable domain: `paypa1-secure-verify[.]com`\n- Host: `paypa1-secure-verify[.]com`\n\n## Assessment\nThe URL uses a leet‑spelled domain paypa1-secure-verify.com that does not resolve, indicating a newly registered or unregistered typosquatted domain. It serves over unencrypted HTTP and contains credential‑lure keywords (billing, secure, update, verify) with a high‑entropy session token. These deterministic flags strongly indicate a phishing attempt to harvest PayPal credentials. The combination of brand spoofing, lack of TLS, and malicious query confirms a high‑risk phishing URL.\n\n## Red flags\n- [LOW] High-entropy query string (3.59 bits) — tracking/session token\n- [MED] Credential-lure keywords: billing, secure, update, verify\n- [HIGH] Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule]\n- [HIGH] Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords\n- [HIGH] Domain is unregistered / NXDOMAIN\n\n## Telemetry\n- Domain age: unregistered | Registrar: n/a | Created: n/a\n- TLS: no_dns | Issuer: n/a | Valid to: n/a | Days left: None\n- Entropy — host label 3.584 bits, query 3.59 bits\n\n## Indicators of Compromise (defanged)\n- `hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5`\n- `paypa1-secure-verify[.]com`\n\n## Mitigation steps\n1. DNS: sinkhole/block paypa1-secure-verify[.]com and all subdomains (*.paypa1-secure-verify[.]com).\n2. Proxy/Web gateway: block URL hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5.\n3. Email gateway: quarantine messages containing the URL; purge delivered copies from mailboxes.\n4. Hunt: search proxy/DNS logs for the last 30 days for hosts that resolved the domain; reset credentials of any user who submitted a form.\n5. Submit to Google Safe Browsing, Microsoft SmartScreen and PhishTank for takedown.\n\n## Abuse-contact report\n```\nSubject: Phishing / abuse report for paypa1-secure-verify[.]com\n\nTo the abuse team at the domain registrar,\n\nThe domain paypa1-secure-verify[.]com is hosting content assessed as Credential Harvesting (MALICIOUS, risk 100/100), impersonating PayPal. Reported URL: hxxp[://]paypa1-secure-verify[.]com/auth/update-billing?session=98a7f6d5\nEvidence: High-entropy query string (3.59 bits) — tracking/session token; Credential-lure keywords: billing, secure, update, verify; Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule]; Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords; Domain is unregistered / NXDOMAIN.\n\nPlease suspend the domain and preserve logs. Report generated by PhishRadar.\n```\n",
+  "debug": {
+    "node_ms": {
+      "1": 0,
+      "3": 141,
+      "2": 1140,
+      "4": 2206,
+      "5": 39
+    },
+    "rdap_ms": 1140,
+    "tls_ms": 141,
+    "ai_attempts": [
+      {
+        "provider": "groq/openai/gpt-oss-120b",
+        "ok": true,
+        "ms": 2012
+      }
+    ],
+    "rules_triggered": [
+      "High-entropy query string (3.59 bits) — tracking/session token (+8)",
+      "Credential-lure keywords: billing, secure, update, verify (+20)",
+      "Homoglyph/leet substitution mimicking 'paypal' [+55 brand-spoof rule] (+55)",
+      "Unencrypted HTTP combined with brand spoofing/typosquatting, credential keywords (+55)",
+      "Domain is unregistered / NXDOMAIN (+25)",
+      "Not eligible for SAFE: not https, TLS check 'no_dns', domain not established, spoofing/obfuscation/high-abuse-TLD flag",
+      "Final verdict: MALICIOUS PHISHING (risk 100/100, rule floor 75)"
+    ],
+    "total_ms": 3386
+  }
 }

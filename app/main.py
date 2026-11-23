@@ -35,10 +35,15 @@ def err_body(code: str, message: str, **extra) -> dict:
     return {"error": message, "code": code, **extra}
 
 
+@app.middleware("http")
+async def _housekeeping(request: Request, call_next):
+    db.maybe_cleanup()  # demo mode: deletes ticket data older than 24 h (throttled)
+    return await call_next(request)
+
+
 @app.exception_handler(ApiError)
 async def _api_error(_: Request, e: ApiError):
-    headers = {"Retry-After": str(e.extra["retry_after_seconds"])} if "retry_after_seconds" in e.extra else None
-    return JSONResponse(err_body(e.code, e.message, **e.extra), status_code=e.status, headers=headers)
+    return JSONResponse(err_body(e.code, e.message, **e.extra), status_code=e.status)
 
 
 @app.exception_handler(StarletteHTTPException)
@@ -149,11 +154,6 @@ def sample(sample_id: str):
 
 
 # ---------------------------------------------------------------- scan
-@app.get("/api/rate")
-def rate(request: Request):
-    return db.rate_status(owner_of(request))
-
-
 @app.post("/api/scan")
 async def scan(req: ScanReq, request: Request):
     t = time.perf_counter()
@@ -164,11 +164,6 @@ async def scan(req: ScanReq, request: Request):
     if config.demo_mode():
         check_ticket(request)
     owner = owner_of(request)
-    st = db.rate_status(owner)
-    if st["remaining"] <= 0:
-        s = st["reset_in_seconds"]
-        raise ApiError("RATE_LIMITED", f"Demo limit of {st['limit']} scans/hour reached. Next slot in {s // 60}m {s % 60:02d}s.", 429,
-                       retry_after_seconds=s, rate=st)
     keys = db.all_keys()
     brand = req.brand.strip()[:60]
 
@@ -177,11 +172,9 @@ async def scan(req: ScanReq, request: Request):
             async for ev in pipeline.run_pipeline(an, brand, keys, owner):
                 if ev["type"] == "result":
                     ai = ev["result"]["ai"]
-                    # A failed AI run is never charged. Without any key there's no AI run to charge either.
-                    if ai["ok"] or (ai.get("code") == "AI_NOT_CONFIGURED" and not config.demo_mode()):
-                        db.rate_consume(owner)
-                        if config.demo_mode():
-                            db.record_demo_run(owner)
+                    # Demo only: a run is counted after the AI step succeeds. A failed run is never charged.
+                    if config.demo_mode() and ai["ok"]:
+                        db.record_demo_run(owner)
                 yield json.dumps(ev) + "\n"
         except Exception as e:  # surface unexpected failures to the UI instead of a dead stream
             print(f"[PhishRadar] scan failed: {type(e).__name__}: {e}")

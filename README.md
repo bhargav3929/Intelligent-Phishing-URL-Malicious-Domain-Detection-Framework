@@ -26,8 +26,6 @@ Click **API Keys** in the app and paste your key (it starts with `gsk_`). Or ope
 3. Now paste your own URL, optionally type the brand you think it imitates, and press **Inspect Target URL**.
 4. Open **IOC Threat Report** to copy the defanged indicators or download the report. Open **URL Diff & Compare** to compare two past scans.
 
-You get 15 full scans per hour. A wrong URL, or a scan where the AI step fails, does not use one up.
-
 ## How it works
 
 URL → five steps → verdict → report.
@@ -45,7 +43,7 @@ Results stream to the page step by step, so you see each step finish.
 ## Project structure
 
 ```
-03-phishradar-threat-intel/
+Intelligent-Phishing-URL-Malicious-Domain-Detection-Framework/
 ├── start.sh / start.bat     one-command start
 ├── run.py                   optional: python run.py
 ├── requirements.txt         pinned packages
@@ -55,27 +53,21 @@ Results stream to the page step by step, so you see each step finish.
 │   ├── config.py            settings read from .env
 │   ├── ai.py                the only file that talks to Groq
 │   ├── pipeline.py          the five steps
-│   ├── db.py                SQLite: history, saved keys, scan limit
+│   ├── db.py                SQLite: history and saved keys
 │   └── static/              index.html, app.js, style.css
+├── tools/record_samples.py   re-records the saved sample results (needs a Groq key)
 └── samples/                 sample URLs; samples/results/ holds their saved results
 ```
 
 ## Troubleshooting
 
 - **Port already in use:** another program is using port 8003. Close it, or change `PORT=` in `.env` and run the start script again.
-- **"The AI service is busy right now":** Groq's free tier is overloaded. Wait a minute and press the button again. This does not use up a scan.
+- **"The AI service is busy right now":** Groq's free tier is overloaded. Wait a minute and press the button again.
 - **"Your Groq key was rejected":** open **API Keys** and paste a fresh key from <https://console.groq.com/keys>.
 - **Python not found:** install Python 3.10+ from <https://www.python.org/downloads/> and, on Windows, tick "Add python.exe to PATH". Then run the start script again.
 - **Install failed:** check your internet connection and run the start script again. It carries on where it stopped.
 - **Windows blocks a `.pyd` file:** Smart App Control can block `pydantic-core`, which FastAPI needs. Turn off Smart App Control, or run the app with WSL.
 - **RDAP shows "unavailable":** `rdap.org` is rate-limiting you. Try again later, or add an IP2WHOIS key in **API Keys**.
+- **The start script won't run:** start the app by hand. Windows (PowerShell): `python -m venv .venv; .\.venv\Scripts\python.exe -m pip install -r requirements.txt; .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8003`. macOS / Linux: `python3 -m venv .venv && ./.venv/bin/python -m pip install -r requirements.txt && ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8003`.
 
 All indicators are defanged (`hxxp[://]evil[.]com`). The sample typosquat and spoof domains are expected to be unregistered.
-
-Run the Commands:
-
-Windows (PowerShell):
-python -m venv .venv; .\.venv\Scripts\python.exe -m pip install -r requirements.txt; .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8003
-
-macOS / Linux (Terminal):
-python3 -m venv .venv && ./.venv/bin/python -m pip install -r requirements.txt && ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8003

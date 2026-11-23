@@ -1,197 +1,222 @@
 {
- "created_at": 1795185915.2693493,
- "url": "https://login.microsoftonline.com.account-reset.xyz/oauth2/authorize",
- "brand_input": "Microsoft",
- "defanged": "hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize",
- "verdict": "MALICIOUS",
- "risk_score": 100,
- "attack_vector": "Subdomain Takeover/Spoof",
- "impersonated_brand": "Microsoft",
- "anatomy": {
-  "ok": true,
-  "normalized_url": "https://login.microsoftonline.com.account-reset.xyz/oauth2/authorize",
-  "note": "",
-  "scheme": "https",
-  "host": "login.microsoftonline.com.account-reset.xyz",
-  "port": null,
-  "subdomains": [
-   "login",
-   "microsoftonline",
-   "com"
-  ],
-  "registrable_domain": "account-reset.xyz",
-  "tld": "xyz",
-  "root_label": "account-reset",
-  "path": "/oauth2/authorize",
-  "query": "",
-  "query_params": [],
-  "is_ip": false,
-  "has_at_symbol": false,
-  "has_punycode": false,
-  "has_brand_spoof": true,
-  "host_entropy": 3.239,
-  "query_entropy": 0.0,
-  "keywords": [
-   "account",
-   "authorize",
-   "login",
-   "oauth",
-   "reset"
-  ],
-  "brand_candidates": [
-   "microsoft"
-  ],
+  "created_at": 1795444361.0276265,
+  "url": "https://login.microsoftonline.com.account-reset.xyz/oauth2/authorize",
+  "brand_input": "Microsoft",
+  "defanged": "hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize",
+  "verdict": "MALICIOUS",
+  "risk_score": 100,
+  "attack_vector": "Credential Harvesting",
+  "impersonated_brand": "Microsoft",
+  "anatomy": {
+    "ok": true,
+    "normalized_url": "https://login.microsoftonline.com.account-reset.xyz/oauth2/authorize",
+    "note": "",
+    "scheme": "https",
+    "host": "login.microsoftonline.com.account-reset.xyz",
+    "port": null,
+    "subdomains": [
+      "login",
+      "microsoftonline",
+      "com"
+    ],
+    "registrable_domain": "account-reset.xyz",
+    "tld": "xyz",
+    "root_label": "account-reset",
+    "path": "/oauth2/authorize",
+    "query": "",
+    "query_params": [],
+    "is_ip": false,
+    "has_at_symbol": false,
+    "has_punycode": false,
+    "has_brand_spoof": true,
+    "host_entropy": 3.239,
+    "query_entropy": 0.0,
+    "keywords": [
+      "account",
+      "authorize",
+      "login",
+      "oauth",
+      "reset"
+    ],
+    "brand_candidates": [
+      "microsoft"
+    ],
+    "flags": [
+      {
+        "sev": "med",
+        "part": "tld",
+        "text": ".xyz is a high-abuse TLD [+20]",
+        "pts": 20
+      },
+      {
+        "sev": "med",
+        "part": "subdomain",
+        "text": "3 stacked subdomain levels",
+        "pts": 8
+      },
+      {
+        "sev": "med",
+        "part": "path",
+        "text": "Credential-lure keywords: account, authorize, login, oauth, reset",
+        "pts": 20
+      },
+      {
+        "sev": "high",
+        "part": "subdomain",
+        "text": "Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule]",
+        "pts": 55
+      }
+    ]
+  },
+  "rdap": {
+    "source": "rdap.org",
+    "status": "unregistered",
+    "registrar": "",
+    "created": "",
+    "expires": "",
+    "age_days": null,
+    "newly_registered": false,
+    "detail": "Domain not found in RDAP — unregistered / NXDOMAIN target.",
+    "probe_ms": 1822
+  },
+  "tls": {
+    "status": "no_dns",
+    "https_enforced": true,
+    "issuer": "",
+    "subject": "",
+    "valid_from": "",
+    "valid_to": "",
+    "days_remaining": null,
+    "san_count": 0,
+    "tls_version": "",
+    "self_signed": false,
+    "expired": false,
+    "hostname_mismatch": false,
+    "detail": "Host does not resolve (NXDOMAIN) — TLS probe skipped.",
+    "probe_ms": 66
+  },
+  "ai": {
+    "provider": "groq/openai/gpt-oss-120b",
+    "ok": true,
+    "ai_score": 100,
+    "confidence": 0.99,
+    "reasoning": "The URL uses a Microsoft brand in a subdomain of an unregistered .xyz domain that does not resolve, indicating a likely spoof. High‑abuse TLD, stacked subdomains, credential‑lure keywords, and failed TLS handshake all point to malicious intent. Deterministic scoring flags give a maximum risk rating.",
+    "red_flags": [
+      "unregistered domain",
+      "high‑abuse TLD .xyz",
+      "brand spoof in subdomain",
+      "credential keywords",
+      "TLS handshake failed"
+    ],
+    "recommended_actions": [
+      "block URL",
+      "alert user",
+      "add to blocklist",
+      "investigate further"
+    ],
+    "error": "",
+    "fallback": false,
+    "attempts": [
+      {
+        "provider": "groq/openai/gpt-oss-120b",
+        "ok": true,
+        "ms": 1105
+      }
+    ]
+  },
+  "baseline_score": 100,
   "flags": [
-   {
-    "sev": "med",
-    "part": "tld",
-    "text": ".xyz is a high-abuse TLD [+20]",
-    "pts": 20
-   },
-   {
-    "sev": "med",
-    "part": "subdomain",
-    "text": "3 stacked subdomain levels",
-    "pts": 8
-   },
-   {
-    "sev": "med",
-    "part": "path",
-    "text": "Credential-lure keywords: account, authorize, login, oauth, reset",
-    "pts": 20
-   },
-   {
-    "sev": "high",
-    "part": "subdomain",
-    "text": "Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule]",
-    "pts": 55
-   }
+    {
+      "sev": "med",
+      "part": "tld",
+      "text": ".xyz is a high-abuse TLD [+20]",
+      "pts": 20
+    },
+    {
+      "sev": "med",
+      "part": "subdomain",
+      "text": "3 stacked subdomain levels",
+      "pts": 8
+    },
+    {
+      "sev": "med",
+      "part": "path",
+      "text": "Credential-lure keywords: account, authorize, login, oauth, reset",
+      "pts": 20
+    },
+    {
+      "sev": "high",
+      "part": "subdomain",
+      "text": "Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule]",
+      "pts": 55
+    },
+    {
+      "sev": "high",
+      "part": "infra",
+      "text": "Domain is unregistered / NXDOMAIN",
+      "pts": 25
+    },
+    {
+      "sev": "high",
+      "part": "infra",
+      "text": "HTTPS requested but live TLS handshake failed",
+      "pts": 30
+    }
   ],
-  "ms": 1
- },
- "rdap": {
-  "source": "rdap.org",
-  "status": "unregistered",
-  "registrar": "",
-  "created": "",
-  "expires": "",
-  "age_days": null,
-  "newly_registered": false,
-  "detail": "Domain not found in RDAP \u2014 unregistered / NXDOMAIN target.",
-  "probe_ms": 1045
- },
- "tls": {
-  "status": "no_dns",
-  "https_enforced": true,
-  "issuer": "",
-  "subject": "",
-  "valid_from": "",
-  "valid_to": "",
-  "days_remaining": null,
-  "san_count": 0,
-  "tls_version": "",
-  "self_signed": false,
-  "expired": false,
-  "hostname_mismatch": false,
-  "detail": "Host does not resolve (NXDOMAIN) \u2014 TLS probe skipped.",
-  "probe_ms": 50
- },
- "ai": {
-  "provider": "heuristic-engine",
-  "ok": false,
-  "error": "No Groq key is set. Open API Keys and paste a free key from console.groq.com/keys.",
-  "code": "AI_NOT_CONFIGURED",
-  "fallback": false,
-  "attempts": []
- },
- "baseline_score": 100,
- "flags": [
-  {
-   "sev": "med",
-   "part": "tld",
-   "text": ".xyz is a high-abuse TLD [+20]",
-   "pts": 20
-  },
-  {
-   "sev": "med",
-   "part": "subdomain",
-   "text": "3 stacked subdomain levels",
-   "pts": 8
-  },
-  {
-   "sev": "med",
-   "part": "path",
-   "text": "Credential-lure keywords: account, authorize, login, oauth, reset",
-   "pts": 20
-  },
-  {
-   "sev": "high",
-   "part": "subdomain",
-   "text": "Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule]",
-   "pts": 55
-  },
-  {
-   "sev": "high",
-   "part": "infra",
-   "text": "Domain is unregistered / NXDOMAIN",
-   "pts": 25
-  },
-  {
-   "sev": "high",
-   "part": "infra",
-   "text": "HTTPS requested but live TLS handshake failed",
-   "pts": 30
-  }
- ],
- "rules_triggered": [
-  ".xyz is a high-abuse TLD [+20] (+20)",
-  "3 stacked subdomain levels (+8)",
-  "Credential-lure keywords: account, authorize, login, oauth, reset (+20)",
-  "Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule] (+55)",
-  "Domain is unregistered / NXDOMAIN (+25)",
-  "HTTPS requested but live TLS handshake failed (+30)",
-  "Not eligible for SAFE: TLS check 'no_dns', domain not established, spoofing/obfuscation/high-abuse-TLD flag",
-  "Final verdict: MALICIOUS PHISHING (risk 100/100, rule floor 75)"
- ],
- "duration_ms": 1064,
- "soc": {
-  "rules": [
-   "DNS: sinkhole/block account-reset[.]xyz and all subdomains (*.account-reset[.]xyz).",
-   "Proxy/Web gateway: block URL hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize.",
-   "Email gateway: quarantine messages containing the URL; purge delivered copies from mailboxes.",
-   "Hunt: search proxy/DNS logs for the last 30 days for hosts that resolved the domain; reset credentials of any user who submitted a form.",
-   "Submit to Google Safe Browsing, Microsoft SmartScreen and PhishTank for takedown."
-  ],
-  "abuse_report": "Subject: Phishing / abuse report for account-reset[.]xyz\n\nTo the abuse team at the domain registrar,\n\nThe domain account-reset[.]xyz is hosting content assessed as Subdomain Takeover/Spoof (MALICIOUS, risk 100/100), impersonating Microsoft. Reported URL: hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize\nEvidence: .xyz is a high-abuse TLD [+20]; 3 stacked subdomain levels; Credential-lure keywords: account, authorize, login, oauth, reset; Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule]; Domain is unregistered / NXDOMAIN.\n\nPlease suspend the domain and preserve logs. Report generated by PhishRadar.",
-  "iocs": [
-   "hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize",
-   "login[.]microsoftonline[.]com[.]account-reset[.]xyz",
-   "account-reset[.]xyz"
-  ]
- },
- "report_md": "# PhishRadar \u2014 SOC Threat Intelligence Brief\n\n**Generated:** 2026-11-20 14:45 UTC  \n**Verdict:** MALICIOUS \u2014 risk score 100/100  \n**Attack vector:** Subdomain Takeover/Spoof  \n**Impersonated brand:** Microsoft  \n**Analysis engine:** heuristic-engine\n\n## Target\n- Defanged URL: `hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize`\n- Registrable domain: `account-reset[.]xyz`\n- Host: `login[.]microsoftonline[.]com[.]account-reset[.]xyz`\n\n## Assessment\nDeterministic engine verdict (no AI provider available).\n\n## Red flags\n- [MED] .xyz is a high-abuse TLD [+20]\n- [MED] 3 stacked subdomain levels\n- [MED] Credential-lure keywords: account, authorize, login, oauth, reset\n- [HIGH] Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule]\n- [HIGH] Domain is unregistered / NXDOMAIN\n- [HIGH] HTTPS requested but live TLS handshake failed\n\n## Telemetry\n- Domain age: unregistered | Registrar: n/a | Created: n/a\n- TLS: no_dns | Issuer: n/a | Valid to: n/a | Days left: None\n- Entropy \u2014 host label 3.239 bits, query 0.0 bits\n\n## Indicators of Compromise (defanged)\n- `hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize`\n- `login[.]microsoftonline[.]com[.]account-reset[.]xyz`\n- `account-reset[.]xyz`\n\n## Mitigation steps\n1. DNS: sinkhole/block account-reset[.]xyz and all subdomains (*.account-reset[.]xyz).\n2. Proxy/Web gateway: block URL hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize.\n3. Email gateway: quarantine messages containing the URL; purge delivered copies from mailboxes.\n4. Hunt: search proxy/DNS logs for the last 30 days for hosts that resolved the domain; reset credentials of any user who submitted a form.\n5. Submit to Google Safe Browsing, Microsoft SmartScreen and PhishTank for takedown.\n\n## Abuse-contact report\n```\nSubject: Phishing / abuse report for account-reset[.]xyz\n\nTo the abuse team at the domain registrar,\n\nThe domain account-reset[.]xyz is hosting content assessed as Subdomain Takeover/Spoof (MALICIOUS, risk 100/100), impersonating Microsoft. Reported URL: hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize\nEvidence: .xyz is a high-abuse TLD [+20]; 3 stacked subdomain levels; Credential-lure keywords: account, authorize, login, oauth, reset; Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule]; Domain is unregistered / NXDOMAIN.\n\nPlease suspend the domain and preserve logs. Report generated by PhishRadar.\n```\n",
- "id": 0,
- "debug": {
-  "node_ms": {
-   "1": 1,
-   "3": 50,
-   "2": 1045,
-   "4": 0,
-   "5": 17
-  },
-  "rdap_ms": 1045,
-  "tls_ms": 50,
-  "ai_attempts": [],
   "rules_triggered": [
-   ".xyz is a high-abuse TLD [+20] (+20)",
-   "3 stacked subdomain levels (+8)",
-   "Credential-lure keywords: account, authorize, login, oauth, reset (+20)",
-   "Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule] (+55)",
-   "Domain is unregistered / NXDOMAIN (+25)",
-   "HTTPS requested but live TLS handshake failed (+30)",
-   "Not eligible for SAFE: TLS check 'no_dns', domain not established, spoofing/obfuscation/high-abuse-TLD flag",
-   "Final verdict: MALICIOUS PHISHING (risk 100/100, rule floor 75)"
+    ".xyz is a high-abuse TLD [+20] (+20)",
+    "3 stacked subdomain levels (+8)",
+    "Credential-lure keywords: account, authorize, login, oauth, reset (+20)",
+    "Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule] (+55)",
+    "Domain is unregistered / NXDOMAIN (+25)",
+    "HTTPS requested but live TLS handshake failed (+30)",
+    "Not eligible for SAFE: TLS check 'no_dns', domain not established, spoofing/obfuscation/high-abuse-TLD flag",
+    "Final verdict: MALICIOUS PHISHING (risk 100/100, rule floor 75)"
   ],
-  "total_ms": 1064
- }
+  "duration_ms": 3155,
+  "soc": {
+    "rules": [
+      "DNS: sinkhole/block account-reset[.]xyz and all subdomains (*.account-reset[.]xyz).",
+      "Proxy/Web gateway: block URL hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize.",
+      "Email gateway: quarantine messages containing the URL; purge delivered copies from mailboxes.",
+      "Hunt: search proxy/DNS logs for the last 30 days for hosts that resolved the domain; reset credentials of any user who submitted a form.",
+      "Submit to Google Safe Browsing, Microsoft SmartScreen and PhishTank for takedown."
+    ],
+    "abuse_report": "Subject: Phishing / abuse report for account-reset[.]xyz\n\nTo the abuse team at the domain registrar,\n\nThe domain account-reset[.]xyz is hosting content assessed as Credential Harvesting (MALICIOUS, risk 100/100), impersonating Microsoft. Reported URL: hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize\nEvidence: .xyz is a high-abuse TLD [+20]; 3 stacked subdomain levels; Credential-lure keywords: account, authorize, login, oauth, reset; Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule]; Domain is unregistered / NXDOMAIN.\n\nPlease suspend the domain and preserve logs. Report generated by PhishRadar.",
+    "iocs": [
+      "hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize",
+      "login[.]microsoftonline[.]com[.]account-reset[.]xyz",
+      "account-reset[.]xyz"
+    ]
+  },
+  "report_md": "# PhishRadar — SOC Threat Intelligence Brief\n\n**Generated:** 2026-11-23 14:32 UTC  \n**Verdict:** MALICIOUS — risk score 100/100  \n**Attack vector:** Credential Harvesting  \n**Impersonated brand:** Microsoft  \n**Analysis engine:** groq/openai/gpt-oss-120b\n\n## Target\n- Defanged URL: `hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize`\n- Registrable domain: `account-reset[.]xyz`\n- Host: `login[.]microsoftonline[.]com[.]account-reset[.]xyz`\n\n## Assessment\nThe URL uses a Microsoft brand in a subdomain of an unregistered .xyz domain that does not resolve, indicating a likely spoof. High‑abuse TLD, stacked subdomains, credential‑lure keywords, and failed TLS handshake all point to malicious intent. Deterministic scoring flags give a maximum risk rating.\n\n## Red flags\n- [MED] .xyz is a high-abuse TLD [+20]\n- [MED] 3 stacked subdomain levels\n- [MED] Credential-lure keywords: account, authorize, login, oauth, reset\n- [HIGH] Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule]\n- [HIGH] Domain is unregistered / NXDOMAIN\n- [HIGH] HTTPS requested but live TLS handshake failed\n\n## Telemetry\n- Domain age: unregistered | Registrar: n/a | Created: n/a\n- TLS: no_dns | Issuer: n/a | Valid to: n/a | Days left: None\n- Entropy — host label 3.239 bits, query 0.0 bits\n\n## Indicators of Compromise (defanged)\n- `hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize`\n- `login[.]microsoftonline[.]com[.]account-reset[.]xyz`\n- `account-reset[.]xyz`\n\n## Mitigation steps\n1. DNS: sinkhole/block account-reset[.]xyz and all subdomains (*.account-reset[.]xyz).\n2. Proxy/Web gateway: block URL hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize.\n3. Email gateway: quarantine messages containing the URL; purge delivered copies from mailboxes.\n4. Hunt: search proxy/DNS logs for the last 30 days for hosts that resolved the domain; reset credentials of any user who submitted a form.\n5. Submit to Google Safe Browsing, Microsoft SmartScreen and PhishTank for takedown.\n\n## Abuse-contact report\n```\nSubject: Phishing / abuse report for account-reset[.]xyz\n\nTo the abuse team at the domain registrar,\n\nThe domain account-reset[.]xyz is hosting content assessed as Credential Harvesting (MALICIOUS, risk 100/100), impersonating Microsoft. Reported URL: hxxps[://]login[.]microsoftonline[.]com[.]account-reset[.]xyz/oauth2/authorize\nEvidence: .xyz is a high-abuse TLD [+20]; 3 stacked subdomain levels; Credential-lure keywords: account, authorize, login, oauth, reset; Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule]; Domain is unregistered / NXDOMAIN.\n\nPlease suspend the domain and preserve logs. Report generated by PhishRadar.\n```\n",
+  "debug": {
+    "node_ms": {
+      "1": 0,
+      "3": 66,
+      "2": 1822,
+      "4": 1294,
+      "5": 38
+    },
+    "rdap_ms": 1822,
+    "tls_ms": 66,
+    "ai_attempts": [
+      {
+        "provider": "groq/openai/gpt-oss-120b",
+        "ok": true,
+        "ms": 1105
+      }
+    ],
+    "rules_triggered": [
+      ".xyz is a high-abuse TLD [+20] (+20)",
+      "3 stacked subdomain levels (+8)",
+      "Credential-lure keywords: account, authorize, login, oauth, reset (+20)",
+      "Brand 'microsoft' used as subdomain of unrelated domain account-reset.xyz [+55 brand-spoof rule] (+55)",
+      "Domain is unregistered / NXDOMAIN (+25)",
+      "HTTPS requested but live TLS handshake failed (+30)",
+      "Not eligible for SAFE: TLS check 'no_dns', domain not established, spoofing/obfuscation/high-abuse-TLD flag",
+      "Final verdict: MALICIOUS PHISHING (risk 100/100, rule floor 75)"
+    ],
+    "total_ms": 3155
+  }
 }

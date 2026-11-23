@@ -1,4 +1,4 @@
-"""SQLite persistence: scan history, API keys, sliding-window rate limiter."""
+"""SQLite persistence: scan history, saved API keys, demo ticket run counts."""
 import json
 import os
 import sqlite3
@@ -8,15 +8,7 @@ from pathlib import Path
 from . import config
 
 DB_PATH = Path(__file__).resolve().parent.parent / "phishradar.db"
-WINDOW_SECONDS = 3600
 KEY_NAMES = ("GROQ_API_KEY", "IP2WHOIS_API_KEY")
-
-
-def _limit() -> int:
-    try:
-        return max(1, int(os.getenv("DEMO_SCAN_LIMIT", "15")))
-    except ValueError:
-        return 15
 
 
 def conn() -> sqlite3.Connection:
@@ -39,8 +31,6 @@ def init() -> None:
                 result_json TEXT NOT NULL
             );
             CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT);
-            CREATE TABLE IF NOT EXISTS rate_events(id INTEGER PRIMARY KEY AUTOINCREMENT, ts REAL NOT NULL, client TEXT NOT NULL);
-            CREATE INDEX IF NOT EXISTS idx_rate ON rate_events(client, ts);
             CREATE TABLE IF NOT EXISTS ticket_runs(tid TEXT PRIMARY KEY, runs INTEGER NOT NULL DEFAULT 0, first_ts REAL NOT NULL);
             CREATE TABLE IF NOT EXISTS daily_runs(day TEXT PRIMARY KEY, runs INTEGER NOT NULL DEFAULT 0);
             """
@@ -49,6 +39,17 @@ def init() -> None:
         if "owner" not in cols:  # history is private per visitor (ticket id in demo mode)
             c.execute("ALTER TABLE scans ADD COLUMN owner TEXT NOT NULL DEFAULT 'local'")
     cleanup()
+
+
+_last_cleanup = 0.0
+
+
+def maybe_cleanup() -> None:
+    """Run cleanup() at most every 10 minutes, so a long-running demo server keeps its 24-hour promise."""
+    global _last_cleanup
+    if config.demo_mode() and time.time() - _last_cleanup > 600:
+        _last_cleanup = time.time()
+        cleanup()
 
 
 def cleanup() -> None:
@@ -60,7 +61,6 @@ def cleanup() -> None:
         old = [r["tid"] for r in c.execute("SELECT tid FROM ticket_runs WHERE first_ts < ?", (cutoff,))]
         for tid in old:
             c.execute("DELETE FROM scans WHERE owner=?", (tid,))
-            c.execute("DELETE FROM rate_events WHERE client=?", (tid,))
         c.execute("DELETE FROM ticket_runs WHERE first_ts < ?", (cutoff,))
         c.execute("DELETE FROM scans WHERE owner!='local' AND created_at < ?", (cutoff,))
 
@@ -123,23 +123,6 @@ def set_key(name: str, value: str) -> None:
 
 def all_keys() -> dict:
     return {n: get_key(n) for n in KEY_NAMES}
-
-
-# ---------- rate limiter ----------
-def rate_status(client: str) -> dict:
-    now = time.time()
-    limit = _limit()
-    with conn() as c:
-        c.execute("DELETE FROM rate_events WHERE ts < ?", (now - WINDOW_SECONDS,))
-        rows = c.execute("SELECT ts FROM rate_events WHERE client=? ORDER BY ts ASC", (client,)).fetchall()
-    used = len(rows)
-    reset_in = int(rows[0]["ts"] + WINDOW_SECONDS - now) + 1 if rows else 0
-    return {"limit": limit, "used": used, "remaining": max(0, limit - used), "reset_in_seconds": max(0, reset_in)}
-
-
-def rate_consume(client: str) -> None:
-    with conn() as c:
-        c.execute("INSERT INTO rate_events(ts, client) VALUES(?,?)", (time.time(), client))
 
 
 # ---------- scans ----------

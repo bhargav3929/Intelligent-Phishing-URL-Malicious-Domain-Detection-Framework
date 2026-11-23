@@ -1,135 +1,154 @@
 {
- "created_at": 1795185914.2043493,
- "url": "https://github.com/login",
- "brand_input": "GitHub",
- "defanged": "hxxps[://]github[.]com/login",
- "verdict": "SAFE",
- "risk_score": 3,
- "attack_vector": "Benign",
- "impersonated_brand": null,
- "anatomy": {
-  "ok": true,
-  "normalized_url": "https://github.com/login",
-  "note": "",
-  "scheme": "https",
-  "host": "github.com",
-  "port": null,
-  "subdomains": [],
-  "registrable_domain": "github.com",
-  "tld": "com",
-  "root_label": "github",
-  "path": "/login",
-  "query": "",
-  "query_params": [],
-  "is_ip": false,
-  "has_at_symbol": false,
-  "has_punycode": false,
-  "has_brand_spoof": false,
-  "host_entropy": 2.585,
-  "query_entropy": 0.0,
-  "keywords": [
-   "login"
-  ],
-  "brand_candidates": [],
-  "flags": [
-   {
-    "sev": "low",
-    "part": "path",
-    "text": "Credential-lure keywords: login",
-    "pts": 3
-   }
-  ],
-  "ms": 1
- },
- "rdap": {
-  "source": "rdap.org",
-  "status": "ok",
-  "registrar": "MarkMonitor Inc.",
-  "created": "2007-10-09T18:20:50Z",
-  "expires": "2028-10-09T18:20:50Z",
-  "age_days": 6981,
-  "newly_registered": false,
-  "detail": "",
-  "domain_status": [
-   "client delete prohibited",
-   "client transfer prohibited",
-   "client update prohibited"
-  ],
-  "probe_ms": 912
- },
- "tls": {
-  "status": "valid",
-  "https_enforced": true,
-  "issuer": "Sectigo Limited (Sectigo Public Server Authentication CA DV E36)",
-  "subject": "github.com",
-  "valid_from": "2026-10-30",
-  "valid_to": "2027-01-27",
-  "days_remaining": 68,
-  "san_count": 2,
-  "tls_version": "TLSv1.3",
-  "self_signed": false,
-  "expired": false,
-  "hostname_mismatch": false,
-  "detail": "Certificate chain and hostname verified against the system trust store.",
-  "resolved_ips": [
-   "20.207.73.82"
-  ],
-  "cert_lifetime_days": 89,
-  "probe_ms": 100
- },
- "ai": {
-  "provider": "heuristic-engine",
-  "ok": false,
-  "error": "No Groq key is set. Open API Keys and paste a free key from console.groq.com/keys.",
-  "code": "AI_NOT_CONFIGURED",
-  "fallback": false,
-  "attempts": []
- },
- "baseline_score": 3,
- "flags": [
-  {
-   "sev": "low",
-   "part": "path",
-   "text": "Credential-lure keywords: login",
-   "pts": 3
-  }
- ],
- "rules_triggered": [
-  "Credential-lure keywords: login (+3)",
-  "SAFE criteria met: https + live TLS valid + established domain (>=90d or RDAP unavailable) + no spoofing/lexical flags",
-  "Final verdict: SAFE (risk 3/100, rule floor 0)"
- ],
- "duration_ms": 931,
- "soc": {
-  "rules": [
-   "No containment required \u2014 allow, retain in passive monitoring.",
-   "Re-scan if the domain's DNS/TLS posture changes."
-  ],
-  "abuse_report": "",
-  "iocs": [
-   "hxxps[://]github[.]com/login",
-   "github[.]com",
-   "20[.]207[.]73[.]82"
-  ]
- },
- "report_md": "# PhishRadar \u2014 SOC Threat Intelligence Brief\n\n**Generated:** 2026-11-20 14:45 UTC  \n**Verdict:** SAFE \u2014 risk score 3/100  \n**Attack vector:** Benign  \n**Impersonated brand:** None identified  \n**Analysis engine:** heuristic-engine\n\n## Target\n- Defanged URL: `hxxps[://]github[.]com/login`\n- Registrable domain: `github[.]com`\n- Host: `github[.]com`\n\n## Assessment\nDeterministic engine verdict (no AI provider available).\n\n## Red flags\n- [LOW] Credential-lure keywords: login\n\n## Telemetry\n- Domain age: 6981 days | Registrar: MarkMonitor Inc. | Created: 2007-10-09T18:20:50Z\n- TLS: valid | Issuer: Sectigo Limited (Sectigo Public Server Authentication CA DV E36) | Valid to: 2027-01-27 | Days left: 68\n- Entropy \u2014 host label 2.585 bits, query 0.0 bits\n\n## Indicators of Compromise (defanged)\n- `hxxps[://]github[.]com/login`\n- `github[.]com`\n- `20[.]207[.]73[.]82`\n\n## Mitigation steps\n1. No containment required \u2014 allow, retain in passive monitoring.\n2. Re-scan if the domain's DNS/TLS posture changes.\n",
- "id": 0,
- "debug": {
-  "node_ms": {
-   "1": 1,
-   "3": 100,
-   "2": 912,
-   "4": 0,
-   "5": 17
+  "created_at": 1795444357.8631804,
+  "url": "https://github.com/login",
+  "brand_input": "GitHub",
+  "defanged": "hxxps[://]github[.]com/login",
+  "verdict": "SAFE",
+  "risk_score": 5,
+  "attack_vector": "Benign",
+  "impersonated_brand": null,
+  "anatomy": {
+    "ok": true,
+    "normalized_url": "https://github.com/login",
+    "note": "",
+    "scheme": "https",
+    "host": "github.com",
+    "port": null,
+    "subdomains": [],
+    "registrable_domain": "github.com",
+    "tld": "com",
+    "root_label": "github",
+    "path": "/login",
+    "query": "",
+    "query_params": [],
+    "is_ip": false,
+    "has_at_symbol": false,
+    "has_punycode": false,
+    "has_brand_spoof": false,
+    "host_entropy": 2.585,
+    "query_entropy": 0.0,
+    "keywords": [
+      "login"
+    ],
+    "brand_candidates": [],
+    "flags": [
+      {
+        "sev": "low",
+        "part": "path",
+        "text": "Credential-lure keywords: login",
+        "pts": 3
+      }
+    ]
   },
-  "rdap_ms": 912,
-  "tls_ms": 100,
-  "ai_attempts": [],
-  "rules_triggered": [
-   "Credential-lure keywords: login (+3)",
-   "SAFE criteria met: https + live TLS valid + established domain (>=90d or RDAP unavailable) + no spoofing/lexical flags",
-   "Final verdict: SAFE (risk 3/100, rule floor 0)"
+  "rdap": {
+    "source": "rdap.org",
+    "status": "ok",
+    "registrar": "MarkMonitor Inc.",
+    "created": "2007-10-09T18:20:50Z",
+    "expires": "2028-10-09T18:20:50Z",
+    "age_days": 6984,
+    "newly_registered": false,
+    "detail": "",
+    "domain_status": [
+      "client delete prohibited",
+      "client transfer prohibited",
+      "client update prohibited"
+    ],
+    "probe_ms": 1274
+  },
+  "tls": {
+    "status": "valid",
+    "https_enforced": true,
+    "issuer": "Sectigo Limited (Sectigo Public Server Authentication CA DV E36)",
+    "subject": "github.com",
+    "valid_from": "2026-10-30",
+    "valid_to": "2027-01-27",
+    "days_remaining": 65,
+    "san_count": 2,
+    "tls_version": "TLSv1.3",
+    "self_signed": false,
+    "expired": false,
+    "hostname_mismatch": false,
+    "detail": "Certificate chain and hostname verified against the system trust store.",
+    "resolved_ips": [
+      "135.235.149.144"
+    ],
+    "cert_lifetime_days": 89,
+    "probe_ms": 93
+  },
+  "ai": {
+    "provider": "groq/openai/gpt-oss-120b",
+    "ok": true,
+    "ai_score": 5,
+    "confidence": 0.95,
+    "reasoning": "The URL uses the official github.com domain, which is long‑registered and has a valid TLS certificate with no hostname mismatch. No IP address, punycode, or suspicious subdomains are present. The only deterministic flag is the keyword \"login\", which is typical for legitimate login pages. Overall the telemetry indicates a benign request.",
+    "red_flags": [
+      "Credential-lure keyword"
+    ],
+    "recommended_actions": [
+      "Allow",
+      "Monitor"
+    ],
+    "error": "",
+    "fallback": false,
+    "attempts": [
+      {
+        "provider": "groq/openai/gpt-oss-120b",
+        "ok": true,
+        "ms": 1201
+      }
+    ]
+  },
+  "baseline_score": 3,
+  "flags": [
+    {
+      "sev": "low",
+      "part": "path",
+      "text": "Credential-lure keywords: login",
+      "pts": 3
+    }
   ],
-  "total_ms": 931
- }
+  "rules_triggered": [
+    "Credential-lure keywords: login (+3)",
+    "SAFE criteria met: https + live TLS valid + established domain (>=90d or RDAP unavailable) + no spoofing/lexical flags",
+    "Final verdict: SAFE (risk 5/100, rule floor 0)"
+  ],
+  "duration_ms": 2699,
+  "soc": {
+    "rules": [
+      "No containment required — allow, retain in passive monitoring.",
+      "Re-scan if the domain's DNS/TLS posture changes."
+    ],
+    "abuse_report": "",
+    "iocs": [
+      "hxxps[://]github[.]com/login",
+      "github[.]com",
+      "135[.]235[.]149[.]144"
+    ]
+  },
+  "report_md": "# PhishRadar — SOC Threat Intelligence Brief\n\n**Generated:** 2026-11-23 14:32 UTC  \n**Verdict:** SAFE — risk score 5/100  \n**Attack vector:** Benign  \n**Impersonated brand:** None identified  \n**Analysis engine:** groq/openai/gpt-oss-120b\n\n## Target\n- Defanged URL: `hxxps[://]github[.]com/login`\n- Registrable domain: `github[.]com`\n- Host: `github[.]com`\n\n## Assessment\nThe URL uses the official github.com domain, which is long‑registered and has a valid TLS certificate with no hostname mismatch. No IP address, punycode, or suspicious subdomains are present. The only deterministic flag is the keyword \"login\", which is typical for legitimate login pages. Overall the telemetry indicates a benign request.\n\n## Red flags\n- [LOW] Credential-lure keywords: login\n\n## Telemetry\n- Domain age: 6984 days | Registrar: MarkMonitor Inc. | Created: 2007-10-09T18:20:50Z\n- TLS: valid | Issuer: Sectigo Limited (Sectigo Public Server Authentication CA DV E36) | Valid to: 2027-01-27 | Days left: 65\n- Entropy — host label 2.585 bits, query 0.0 bits\n\n## Indicators of Compromise (defanged)\n- `hxxps[://]github[.]com/login`\n- `github[.]com`\n- `135[.]235[.]149[.]144`\n\n## Mitigation steps\n1. No containment required — allow, retain in passive monitoring.\n2. Re-scan if the domain's DNS/TLS posture changes.\n",
+  "debug": {
+    "node_ms": {
+      "1": 0,
+      "3": 93,
+      "2": 1274,
+      "4": 1385,
+      "5": 38
+    },
+    "rdap_ms": 1274,
+    "tls_ms": 93,
+    "ai_attempts": [
+      {
+        "provider": "groq/openai/gpt-oss-120b",
+        "ok": true,
+        "ms": 1201
+      }
+    ],
+    "rules_triggered": [
+      "Credential-lure keywords: login (+3)",
+      "SAFE criteria met: https + live TLS valid + established domain (>=90d or RDAP unavailable) + no spoofing/lexical flags",
+      "Final verdict: SAFE (risk 5/100, rule floor 0)"
+    ],
+    "total_ms": 2699
+  }
 }

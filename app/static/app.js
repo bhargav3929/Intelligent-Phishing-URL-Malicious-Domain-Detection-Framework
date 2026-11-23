@@ -3,7 +3,7 @@ const $ = (s, r = document) => r.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const NODES = ["URL Gatekeeper & Anatomy Parser", "RDAP / WHOIS Domain Telemetry", "Live TLS/SSL Certificate Inspector", "AI Adversarial Brand & Phishing Classifier", "SOC Threat Brief & Persistence"];
 let SAMPLES = [];
-const state = { scan: null, rate: null, rateAt: 0, busy: false, raw: [], timer: null, info: null };
+const state = { scan: null, busy: false, raw: [], timer: null, info: null };
 
 /* ---------- demo ticket (kept for the session, removed from the address bar) ---------- */
 let TICKET = "";
@@ -64,22 +64,6 @@ $("#samples").onclick = async e => {
   runScan();
 };
 
-/* ---------- rate pill ---------- */
-async function refreshRate() {
-  try { state.rate = await (await api("api/rate")).json(); state.rateAt = Date.now(); } catch { }
-  drawRate();
-}
-function drawRate() {
-  const r = state.rate; if (!r) return;
-  const left = Math.max(0, r.reset_in_seconds - Math.floor((Date.now() - state.rateAt) / 1000));
-  let remaining = r.remaining;
-  if (r.used > 0 && left === 0) { refreshRate(); return; }
-  const pill = $("#ratePill");
-  pill.className = "pill" + (remaining === 0 ? " out" : remaining <= 2 ? " low" : "");
-  $("#rateText").textContent = `${remaining}/${r.limit} Free Demo Scans Left This Hour` + (r.used > 0 ? ` · next slot ${fmtTime(left)}` : "");
-}
-setInterval(drawRate, 1000);
-setInterval(refreshRate, 30000);
 
 /* ---------- keys ---------- */
 async function loadKeys() {
@@ -131,7 +115,7 @@ async function runScan() {
       const j = await r.json().catch(() => ({ error: "Server error " + r.status }));
       if (j.code === "BAD_INPUT") { st[1] = { status: "error", summary: "Rejected" }; drawTracker(st); bannerMsg("Gatekeeper rejected input"); }
       else drawTracker();
-      toast(j.error, r.status === 429 ? "warn" : "", j.code); refreshRate(); return;
+      toast(j.error, r.status === 429 ? "warn" : "", j.code); return;
     }
     const reader = r.body.getReader(), dec = new TextDecoder(); let buf = "";
     for (; ;) {
@@ -147,7 +131,7 @@ async function runScan() {
       }
     }
   } catch (err) { toast("Request failed: " + err.message); }
-  finally { stopTimer(t0, failed); state.busy = false; $("#scanBtn").disabled = false; refreshRate(); }
+  finally { stopTimer(t0, failed); state.busy = false; $("#scanBtn").disabled = false; }
 }
 
 /* ---------- timer + logs ---------- */
@@ -312,5 +296,5 @@ async function renderCompare() {
   try { state.info = await (await api("api/info")).json(); } catch { }
   if (state.info && state.info.mode === "demo") { $("#keysBtn").style.display = "none"; if (!TICKET) $("#intakeNote").textContent = "Samples only - sign in on lastsem.com to try your own input"; }
   else loadKeys();
-  loadSamples(); refreshRate();
+  loadSamples();
 })();
