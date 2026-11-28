@@ -174,7 +174,7 @@ function renderInspect() {
   const pq = an.path + (an.query ? "?" + an.query : "");
   const rd = s.rdap, tl = s.tls;
   const ageTxt = rd.age_days != null ? `${rd.age_days} days` : "—";
-  const stCls = x => ({ valid: "good", ok: "good", invalid: "bad", unregistered: "bad", no_dns: "bad" }[x] || (x === "skipped" ? "na" : "mid"));
+  const stCls = x => ({ valid: "good", ok: "good", invalid: "bad", unregistered: "bad", no_dns: "bad", no_record: "mid" }[x] || (x === "skipped" ? "na" : "mid"));
   $("#view-inspect").innerHTML = `
   <div class="card hero ${s.verdict}">
     ${gauge(s.risk_score, c)}

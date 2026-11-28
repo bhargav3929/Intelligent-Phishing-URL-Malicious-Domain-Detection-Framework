@@ -286,7 +286,12 @@ async def rdap_lookup(domain: str, is_ip: bool, ip2whois_key: str = "") -> dict:
             out["detail"] = f"RDAP unreachable ({type(e).__name__})"
             return out
         if r.status_code == 404:
-            out.update(status="unregistered", detail="Domain not found in RDAP — unregistered / NXDOMAIN target.")
+            # rdap.org also answers 404 when a registry publishes no RDAP data (.me, shared hosts like github.io).
+            # Only call the domain unregistered when it doesn't resolve in DNS either.
+            if await _resolves(domain):
+                out.update(status="no_record", detail="The registry publishes no public RDAP record for this domain, so its age is unknown.")
+            else:
+                out.update(status="unregistered", detail="Domain not found in RDAP and does not resolve in DNS — unregistered / NXDOMAIN target.")
             return out
         if r.status_code != 200:
             out["detail"] = f"RDAP returned HTTP {r.status_code}"
@@ -311,6 +316,14 @@ async def rdap_lookup(domain: str, is_ip: bool, ip2whois_key: str = "") -> dict:
     out["status"] = "ok"
     out["domain_status"] = j.get("status", [])
     return _finish_age(out, created)
+
+
+async def _resolves(domain: str) -> bool:
+    try:
+        await asyncio.wait_for(asyncio.to_thread(socket.getaddrinfo, domain, None), timeout=3.0)
+        return True
+    except (OSError, asyncio.TimeoutError):
+        return False
 
 
 def _finish_age(out: dict, created):
@@ -624,7 +637,7 @@ async def run_pipeline(an: dict, brand_input: str, keys: dict, owner: str = "loc
             results[n] = r
             node_ms[n] = r["probe_ms"]
             if n == 2:
-                ok = r["status"] in ("ok", "unregistered", "skipped")
+                ok = r["status"] in ("ok", "unregistered", "no_record", "skipped")
                 if r["status"] == "ok":
                     summ = f"{r['registrar'] or 'registrar n/a'} · {r['age_days']}d old" if r.get("age_days") is not None else "age unknown"
                 else:
